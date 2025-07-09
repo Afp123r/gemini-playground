@@ -320,6 +320,8 @@ input[type="number"] {
     align-items: center;
     justify-content: center;
     white-space: nowrap; /* Prevent text wrapping */
+    position: relative; /* For ripple effect */
+    overflow: hidden; /* For ripple effect */
 }
 
 .input-controls button:hover {
@@ -332,6 +334,26 @@ input[type="number"] {
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
+}
+
+/* 整合旧版按钮波纹效果 */
+.input-controls button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+    pointer-events: none; /* Ensure clicks pass through */
+}
+
+.input-controls button:active::after {
+    width: 200px;
+    height: 200px;
 }
 
 #mic-button.active { /* For mic_off state */
@@ -388,10 +410,27 @@ input[type="number"] {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #4CAF50, #8BC34A); /* Green gradient */
-    transition: width 0.1s ease-out;
+    /* transition: width 0.1s ease-out; // 移除此行，使用动画代替 */
     position: absolute;
     top: 0;
     left: 0;
+}
+
+/* 整合旧版音频条跳动动画 */
+@keyframes audio-pulse {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.5);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+.audio-bar.active {
+    animation: audio-pulse 0.5s infinite;
 }
 
 /* Video and Screen Containers */
@@ -485,4 +524,49 @@ input[type="number"] {
     .visualizer-container {
         min-width: unset;
     }
+
+    /* 移动端配置面板的显示行为 */
+    #config-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(100%); /* 默认隐藏在右侧 */
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        display: block; /* 在移动端默认 display: block 以便 transform 生效 */
+        background: #36393F; /* 与主应用背景一致 */
+        padding: 20px;
+        max-height: unset; /* 移除 max-height 限制 */
+        opacity: 1; /* 移除 opacity 限制 */
+    }
+
+    #config-container.active {
+        transform: translateX(0); /* 激活时滑入 */
+    }
+
+    /* 隐藏桌面端才有的样式 */
+    .hidden-mobile {
+        /* 
+         * 此处的 hidden-mobile 类在 HTML 中应用于 #config-container。
+         * 在桌面端，它的默认 display 是 block，通过 JS 控制 active 类来切换 max-height/opacity/transform。
+         * 在移动端，我们希望它默认是 display: none，然后通过 JS 切换 active 类来控制 translateX。
+         * 
+         * 由于 #config-container 在 CSS 中已经有了默认的 display: none; 和 @media 中的 display: block;
+         * 并且我们主要通过 JS 切换 .active 类来控制其状态，
+         * 这里的 .hidden-mobile 类可以保持其原始含义，即在移动端默认隐藏，通过 JS 移除该类并添加 .active 来显示。
+         * 
+         * 当前的 CSS 逻辑是：
+         * #config-container 默认 max-height: 0; opacity: 0; transform: translateY(-10px);
+         * #config-container.active 变为 max-height: 500px; opacity: 1; transform: translateY(0);
+         * 在 @media (max-width: 768px) 中，#config-container 变为 transform: translateX(100%);
+         * 且 #config-container.active 变为 transform: translateX(0);
+         * 
+         * 这种方式结合了两种动画，但可能不够流畅。
+         * 为了更纯粹的移动端侧滑效果，我修改了 #config-container 的移动端样式，使其默认隐藏在右侧，激活时滑入。
+         */
+    }
 }
+
