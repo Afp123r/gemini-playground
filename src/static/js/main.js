@@ -36,14 +36,14 @@ const systemInstructionInput = document.getElementById('system-instruction');
 systemInstructionInput.value = CONFIG.SYSTEM_INSTRUCTION.TEXT;
 const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
-const languageSelect = document.getElementById('language-select'); // New: Get language select element
+const languageSelect = document.getElementById('language-select'); // 新增：获取语言选择元素
 
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
 const savedVoice = localStorage.getItem('gemini_voice');
 const savedFPS = localStorage.getItem('video_fps');
 const savedSystemInstruction = localStorage.getItem('system_instruction');
-const savedLanguage = localStorage.getItem('gemini_language'); // New: Load saved language
+const savedLanguage = localStorage.getItem('gemini_language'); // 新增：加载保存的语言
 
 if (savedApiKey) {
     apiKeyInput.value = savedApiKey;
@@ -58,7 +58,7 @@ if (savedSystemInstruction) {
     systemInstructionInput.value = savedSystemInstruction;
     CONFIG.SYSTEM_INSTRUCTION.TEXT = savedSystemInstruction;
 }
-if (savedLanguage) { // New: Set saved language
+if (savedLanguage) { // 新增：设置保存的语言
     languageSelect.value = savedLanguage;
 }
 
@@ -256,17 +256,17 @@ async function connectToWebsocket() {
     localStorage.setItem('gemini_api_key', apiKeyInput.value);
     localStorage.setItem('gemini_voice', voiceSelect.value);
     localStorage.setItem('system_instruction', systemInstructionInput.value);
-    localStorage.setItem('gemini_language', languageSelect.value); // New: Save selected language
+    localStorage.setItem('gemini_language', languageSelect.value); // 新增：保存选择的语言
 
     const config = {
         model: CONFIG.API.MODEL_NAME,
         generationConfig: {
             responseModalities: responseTypeSelect.value,
             speechConfig: {
-				languageCode: languageSelect.value, // Updated: Use selected language code
+				languageCode: languageSelect.value, // 更新：使用选择的语言代码
                 voiceConfig: { 
                     prebuiltVoiceConfig: { 
-                        voiceName: voiceSelect.value    // You can change voice in the config.js file
+                        voiceName: voiceSelect.value    // 您可以在 config.js 文件中更改声音
                     }
                 }
             },
@@ -274,7 +274,7 @@ async function connectToWebsocket() {
         },
         systemInstruction: {
             parts: [{
-                text: systemInstructionInput.value     // You can change system instruction in the config.js file
+                text: systemInstructionInput.value     // 您可以在 config.js 文件中更改系统指令
             }],
         }
     };  
