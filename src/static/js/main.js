@@ -518,10 +518,13 @@ function stopVideo() {
             Logger.info('No active srcObject found on preview element.');
         }
         
-        // 尝试重置 video 元素以清除任何残留的渲染状态
-        preview.removeAttribute('src'); // 移除任何残留的 src 属性
-        preview.load(); // 告诉视频元素重新加载 (这会清除内部缓冲区)
-        Logger.info('Video element src removed and loaded.');
+        // **关键修复：强制视频元素重置以清除残留画面**
+        // 1. 设置一个空字符串作为 src
+        preview.src = ''; 
+        // 2. 强制加载这个空 src，这会清空内部缓冲区
+        preview.load();   
+        Logger.info('Video element src set to empty and loaded for clearing.');
+
     } else {
         Logger.info('Preview element not found.');
     }
@@ -609,10 +612,13 @@ function stopScreenSharing() {
             Logger.info('No active srcObject found on screenPreview element.');
         }
         
-        // 尝试重置 video 元素以清除任何残留的渲染状态
-        screenPreview.removeAttribute('src'); // 移除任何残留的 src 属性
-        screenPreview.load(); // 告诉视频元素重新加载 (这会清除内部缓冲区)
-        Logger.info('Screen preview element src removed and loaded.');
+        // **关键修复：强制视频元素重置以清除残留画面**
+        // 1. 设置一个空字符串作为 src
+        screenPreview.src = ''; 
+        // 2. 强制加载这个空 src，这会清空内部缓冲区
+        screenPreview.load();   
+        Logger.info('Screen preview element src set to empty and loaded for clearing.');
+
     } else {
         Logger.info('Screen preview element not found.');
     }
