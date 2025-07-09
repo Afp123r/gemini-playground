@@ -19,10 +19,10 @@ export class ScreenRecorder {
         this.stream = null;
         this.isRecording = false;
         this.onScreenData = null;
-        this.frameCanvas = document.createElement('canvas');
+        this.frameCanvas = document.createElement('canvas'); // Internal canvas for capturing
         this.frameCtx = this.frameCanvas.getContext('2d');
         this.captureInterval = null;
-        this.previewElement = null;
+        this.previewElement = null; // The <video> element in HTML
         this.options = {
             fps: 2, // Lower FPS for screen sharing
             quality: 0.8,
@@ -45,6 +45,7 @@ export class ScreenRecorder {
             this.onScreenData = onScreenData;
             this.previewElement = previewElement;
 
+            Logger.info('ScreenRecorder: Requesting screen sharing access.');
             // Request screen sharing access with audio
             this.stream = await navigator.mediaDevices.getDisplayMedia({ 
                 video: {
@@ -61,29 +62,33 @@ export class ScreenRecorder {
                 await new Promise((resolve) => {
                     this.previewElement.onloadedmetadata = () => {
                         this.previewElement.play()
-                            .then(resolve)
-                            .catch(error => {
-                                Logger.error('Failed to play preview:', error);
+                            .then(() => {
+                                Logger.info('ScreenRecorder: Preview video started playing.');
+                                // Set canvas size based on video dimensions after metadata is loaded
+                                this.frameCanvas.width = this.previewElement.videoWidth;
+                                this.frameCanvas.height = this.previewElement.videoHeight;
+                                Logger.info(`ScreenRecorder: Canvas size set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
                                 resolve();
+                            })
+                            .catch(error => {
+                                Logger.error('ScreenRecorder: Failed to play preview:', error);
+                                resolve(); // Resolve anyway to not block
                             });
                     };
                 });
-
-                // Set canvas size based on video dimensions
-                this.frameCanvas.width = this.previewElement.videoWidth;
-                this.frameCanvas.height = this.previewElement.videoHeight;
             }
 
             // Start frame capture loop
             this.isRecording = true;
             this.startFrameCapture();
             
-            // Handle stream stop
+            // Handle stream stop - crucial for automatic cleanup if user stops sharing via browser UI
             this.stream.getVideoTracks()[0].addEventListener('ended', () => {
-                this.stop();
+                Logger.info('ScreenRecorder: Screen sharing stream ended by user/browser.');
+                this.stop(); // Call internal stop method
             });
 
-            Logger.info('Screen recording started');
+            Logger.info('ScreenRecorder: Screen recording started successfully.');
 
         } catch (error) {
             if (error.name === 'NotAllowedError') {
@@ -93,6 +98,7 @@ export class ScreenRecorder {
                     { originalError: error }
                 );
             }
+            Logger.error('ScreenRecorder: Failed to start screen recording:', error);
             throw new ApplicationError(
                 'Failed to start screen recording',
                 ErrorCodes.SCREEN_START_FAILED,
@@ -109,15 +115,19 @@ export class ScreenRecorder {
         const frameInterval = 1000 / this.options.fps;
         
         this.captureInterval = setInterval(() => {
-            if (!this.isRecording || !this.previewElement || !this.onScreenData) return;
+            if (!this.isRecording || !this.previewElement || !this.onScreenData) {
+                //Logger.debug('ScreenRecorder: Skipping capture - not recording or missing elements.');
+                return;
+            }
             
             try {
                 // Ensure video is playing and ready
                 if (this.previewElement.readyState >= this.previewElement.HAVE_CURRENT_DATA) {
-                    // Update canvas size if needed
-                    if (this.frameCanvas.width !== this.previewElement.videoWidth) {
+                    // Update canvas size if needed (e.g., if screen resolution changes during share)
+                    if (this.frameCanvas.width !== this.previewElement.videoWidth || this.frameCanvas.height !== this.previewElement.videoHeight) {
                         this.frameCanvas.width = this.previewElement.videoWidth;
                         this.frameCanvas.height = this.previewElement.videoHeight;
+                        Logger.info(`ScreenRecorder: Canvas size updated to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
                     }
 
                     // Draw current video frame to canvas
@@ -134,16 +144,16 @@ export class ScreenRecorder {
                     
                     if (this.validateFrame(base64Data)) {
                         this.frameCount++;
-                        Logger.debug(`Screen frame #${this.frameCount} captured`);
+                        //Logger.debug(`ScreenRecorder: Screen frame #${this.frameCount} captured`);
                         this.onScreenData(base64Data);
                     }
                 }
             } catch (error) {
-                Logger.error('Screen frame capture error:', error);
+                Logger.error('ScreenRecorder: Screen frame capture error:', error);
             }
         }, frameInterval);
 
-        Logger.info(`Screen capture started at ${this.options.fps} FPS`);
+        Logger.info(`ScreenRecorder: Screen capture interval set at ${this.options.fps} FPS`);
     }
 
     /**
@@ -151,28 +161,44 @@ export class ScreenRecorder {
      * @throws {ApplicationError} Throws an error if the screen recording fails to stop.
      */
     stop() {
+        Logger.info('ScreenRecorder: Stopping screen recording.');
         try {
             this.isRecording = false;
             
             if (this.captureInterval) {
                 clearInterval(this.captureInterval);
                 this.captureInterval = null;
+                Logger.info('ScreenRecorder: Capture interval cleared.');
             }
 
             if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop());
+                this.stream.getTracks().forEach(track => {
+                    track.stop();
+                    Logger.info(`ScreenRecorder: Track stopped: ${track.kind} - ${track.label}`);
+                });
                 this.stream = null;
+                Logger.info('ScreenRecorder: Stream nullified.');
             }
 
             if (this.previewElement) {
-                this.previewElement.srcObject = null;
-                this.previewElement = null;
+                this.previewElement.pause(); // Pause the preview video
+                this.previewElement.srcObject = null; // Clear srcObject
+                this.previewElement.src = ''; // Clear src
+                this.previewElement.load(); // Reload to clear buffer
+                // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
+                Logger.info('ScreenRecorder: Preview element cleaned.');
             }
 
-            Logger.info('Screen recording stopped');
+            // Clear internal canvas to prevent data accumulation
+            if (this.frameCanvas) {
+                this.frameCtx.clearRect(0, 0, this.frameCanvas.width, this.frameCanvas.height);
+                Logger.info('ScreenRecorder: Internal frameCanvas cleared.');
+            }
+
+            Logger.info('ScreenRecorder: Screen recording stopped successfully.');
 
         } catch (error) {
-            Logger.error('Failed to stop screen recording:', error);
+            Logger.error('ScreenRecorder: Failed to stop screen recording:', error);
             throw new ApplicationError(
                 'Failed to stop screen recording',
                 ErrorCodes.SCREEN_STOP_FAILED,
@@ -188,13 +214,13 @@ export class ScreenRecorder {
      * @private
      */
     validateFrame(base64Data) {
-        if (!/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
-            Logger.error('Invalid screen frame base64 data');
+        if (!base64Data || !/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
+            Logger.error('ScreenRecorder: Invalid screen frame base64 data');
             return false;
         }
         
-        if (base64Data.length < 1024) {
-            Logger.error('Screen frame too small');
+        if (base64Data.length < 1024) { // Minimum reasonable size for a valid JPEG frame
+            Logger.error('ScreenRecorder: Screen frame too small, possibly empty or invalid.');
             return false;
         }
         
@@ -216,4 +242,4 @@ export class ScreenRecorder {
         }
         return true;
     }
-} 
+}
