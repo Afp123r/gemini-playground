@@ -59,11 +59,17 @@ export class VideoRecorder {
                 }
             });
 
+            if (!this.stream || this.stream.getTracks().length === 0) {
+                Logger.error('VideoRecorder: getUserMedia returned no tracks or an invalid stream.');
+                throw new Error('No video stream tracks available.');
+            }
+            Logger.info(`VideoRecorder: getUserMedia successful. Stream has ${this.stream.getTracks().length} tracks.`);
+
             const videoTrack = this.stream.getVideoTracks()[0];
             const settings = videoTrack.getSettings();
             this.actualWidth = settings.width;
             this.actualHeight = settings.height;
-            Logger.info(`VideoRecorder: Actual video resolution received: ${this.actualWidth}x${this.actualHeight}`);
+            Logger.info(`VideoRecorder: Actual video resolution received from camera: ${this.actualWidth}x${this.actualHeight}`);
 
             // Set internal canvas dimensions for frame processing to match actual stream
             // This canvas is for sending frames to the API, not for display
@@ -72,7 +78,6 @@ export class VideoRecorder {
             Logger.info(`VideoRecorder: Internal frameCanvas set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
 
             // Set up preview on the HTML <video> element
-            Logger.info(`VideoRecorder: Assigning new stream to previewElement.srcObject. Current srcObject: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
             this.previewElement.srcObject = this.stream;
             // **CRITICAL FIX:** Set the video element's width and height attributes to its intrinsic resolution
             // This tells the browser the video's native aspect ratio, helping it render correctly.
@@ -80,23 +85,27 @@ export class VideoRecorder {
             this.previewElement.height = this.actualHeight;
             Logger.info(`VideoRecorder: HTML previewElement attributes set to ${this.previewElement.width}x${this.previewElement.height}`);
 
-            await this.previewElement.play();
-            Logger.info('VideoRecorder: Preview video started playing successfully.');
+            await this.previewElement.play()
+                .then(() => Logger.info('VideoRecorder: Preview video started playing.'))
+                .catch(error => {
+                    Logger.error('VideoRecorder: Failed to play preview video:', error);
+                    throw error; // Re-throw to be caught by VideoManager
+                });
 
             // Start frame capture loop
             this.isRecording = true;
             this.startFrameCapture();
             
-            // Listen for track ended event (e.g., if camera is disconnected)
+            // Listen for track ended event (e.g., if camera is disconnected by OS/user)
             videoTrack.addEventListener('ended', () => {
-                Logger.info('VideoRecorder: Camera track ended by system/user.');
+                Logger.info('VideoRecorder: Camera track ended by system/user. Calling stop().');
                 this.stop(); // Ensure proper cleanup
             });
 
             Logger.info('VideoRecorder: Video recording started successfully.');
 
         } catch (error) {
-            Logger.error('VideoRecorder: Failed to start video recording:', error);
+            Logger.error('VideoRecorder: Failed to start video recording (getUserMedia or play failed):', error);
             throw new ApplicationError(
                 'Failed to start video recording',
                 ErrorCodes.VIDEO_START_FAILED,
@@ -143,6 +152,8 @@ export class VideoRecorder {
                     
                     // Pass actual dimensions along with base64Data
                     this.onVideoData(base64Data, this.actualWidth, this.actualHeight); 
+                } else {
+                    //Logger.debug(`VideoRecorder: Preview element not ready for drawing. ReadyState: ${this.previewElement.readyState}`);
                 }
             } catch (error) {
                 Logger.error('VideoRecorder: Frame capture error:', error);
@@ -178,11 +189,9 @@ export class VideoRecorder {
 
             if (this.previewElement) {
                 this.previewElement.pause(); // Pause the video playback
-                Logger.info(`VideoRecorder: previewElement.srcObject before null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 this.previewElement.srcObject = null; // Clear the srcObject
                 this.previewElement.src = ''; // Clear the src attribute
                 this.previewElement.load(); // Force the video element to reload/clear its buffer
-                Logger.info(`VideoRecorder: previewElement.srcObject after null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
                 Logger.info('VideoRecorder: Preview element cleaned.');
             }
