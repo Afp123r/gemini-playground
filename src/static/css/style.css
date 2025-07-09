@@ -18,6 +18,7 @@
     --spacing-lg: 24px;
     --primary-color-rgb: 76, 175, 80; /* RGB for primary color */
 }
+
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     justify-content: center;
@@ -30,6 +31,7 @@ body {
     padding: var(--spacing-lg); /* Add padding to body */
     box-sizing: border-box; /* Include padding in element's total width and height */
 }
+
 #app {
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
@@ -41,13 +43,15 @@ body {
     flex-direction: column;
     gap: var(--spacing-md); /* Consistent spacing between sections */
 }
-/* Header Bar for API Key and Settings Toggle */
+
+/* Header Bar for API Key and Config Toggle */
 .header-bar {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
 }
+
 #api-key {
     flex-grow: 1;
     padding: 12px 15px;
@@ -59,14 +63,17 @@ body {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
 #api-key::placeholder {
     color: var(--text-secondary);
 }
+
 #api-key:focus {
     border-color: var(--primary-color);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
     outline: none;
 }
+
 /* Config Toggle Button */
 #config-toggle {
     background-color: var(--secondary-color);
@@ -79,14 +86,17 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
+
 #config-toggle:hover {
     background-color: #1976D2; /* Darker blue on hover */
     transform: translateY(-1px);
 }
+
 #config-toggle.active {
     background-color: var(--primary-color); /* Green when active */
     transform: rotate(90deg);
 }
+
 /* Configuration Container */
 #config-container {
     background-color: #F0F0F0; /* Slightly darker surface for config */
@@ -100,27 +110,32 @@ body {
     opacity: 0;
     transform: translateY(-10px);
 }
+
 #config-container.active {
     max-height: 500px; /* Adjust based on content height */
     opacity: 1;
     transform: translateY(0);
 }
+
 .config-wrapper {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
 }
+
 .setting-container {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
 }
+
 .setting-label {
     font-weight: bold;
     color: var(--text-secondary);
     min-width: 90px; /* Align labels */
 }
+
 select, textarea, input[type="number"] {
     flex-grow: 1;
     padding: 10px 12px;
@@ -133,24 +148,29 @@ select, textarea, input[type="number"] {
     transition: border-color 0.3s ease;
     min-width: 150px;
 }
+
 select:focus, textarea:focus, input[type="number"]:focus {
     border-color: var(--primary-color);
     outline: none;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
 }
+
 textarea {
     resize: vertical;
     min-height: 100px; /* Slightly larger textarea */
 }
+
 input[type="number"] {
     width: 80px;
     text-align: center;
 }
+
 .fps-help {
     font-size: 0.85em;
     color: var(--text-secondary);
     margin-left: var(--spacing-sm);
 }
+
 #apply-config {
     background-color: var(--primary-color);
     color: white;
@@ -164,10 +184,12 @@ input[type="number"] {
     box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.3);
     align-self: flex-end;
 }
+
 #apply-config:hover {
     background-color: #388E3C; /* Darker green on hover */
     transform: translateY(-2px);
 }
+
 /* Connect Button */
 #connect-button {
     background-color: var(--secondary-color);
@@ -182,24 +204,29 @@ input[type="number"] {
     box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3); /* Shadow for blue button */
     width: 100%;
 }
+
 #connect-button:hover {
     background-color: #1976D2;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
 }
+
 #connect-button.connected {
     background-color: var(--danger-color);
     box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3); /* Shadow for red button */
 }
+
 #connect-button.connected:hover {
     background-color: #D32F2F;
 }
+
 #connect-button:disabled {
     background-color: #B0B0B0; /* Lighter grey for disabled */
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
+
 /* Log Container */
 #logs-container {
     border: 1px solid var(--border-color);
@@ -214,9 +241,11 @@ input[type="number"] {
     flex-direction: column;
     gap: var(--spacing-sm);
 }
+
 #logs-container:hover {
     box-shadow: 0 4px 15px var(--shadow-color);
 }
+
 .log-entry {
     display: flex;
     align-items: flex-start;
@@ -226,31 +255,37 @@ input[type="number"] {
     font-size: 0.95em;
     line-height: 1.5;
 }
+
 .log-entry.system {
     background-color: #E8F5E9; /* Light green */
     color: #388E3C; /* Dark green text */
 }
+
 .log-entry.user {
     background-color: #E3F2FD; /* Light blue */
     color: #1976D2; /* Dark blue text */
     align-self: flex-end; /* User messages align right */
     max-width: 80%;
 }
+
 .log-entry.ai {
     background-color: #FFEBEE; /* Light red */
     color: #D32F2F; /* Dark red text */
     align-self: flex-start; /* AI messages align left */
     max-width: 80%;
 }
+
 .log-entry .timestamp {
     font-size: 0.8em;
     color: var(--text-secondary);
     white-space: nowrap;
 }
+
 .log-entry .emoji {
     font-size: 1.1em;
     line-height: 1;
 }
+
 /* Input Controls (Message Input & Buttons) */
 .input-controls {
     display: flex;
@@ -258,6 +293,7 @@ input[type="number"] {
     align-items: stretch;
     flex-wrap: wrap;
 }
+
 #message-input {
     flex-grow: 1;
     padding: 12px 15px;
@@ -269,19 +305,23 @@ input[type="number"] {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
     min-width: 150px;
 }
+
 #message-input::placeholder {
     color: var(--text-secondary);
 }
+
 #message-input:focus {
     border-color: var(--secondary-color);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(33, 150, 243, 0.2);
     outline: none;
 }
+
 #message-input:disabled {
     background-color: #E0E0E0;
     cursor: not-allowed;
     color: #B0B0B0;
 }
+
 .input-controls button {
     background-color: var(--secondary-color);
     color: white;
@@ -299,16 +339,19 @@ input[type="number"] {
     position: relative;
     overflow: hidden; /* For ripple effect */
 }
+
 .input-controls button:hover {
     background-color: #1976D2;
     transform: translateY(-1px);
 }
+
 .input-controls button:disabled {
     background-color: #B0B0B0;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
+
 /* Button Ripple Effect */
 .input-controls button::after {
     content: '';
@@ -324,24 +367,29 @@ input[type="number"] {
     pointer-events: none;
     opacity: 0; /* Start hidden */
 }
+
 .input-controls button:active::after {
     width: 200px;
     height: 200px;
     opacity: 1; /* Fade in on active */
     transition: width 0.0s, height 0.0s, opacity 0.3s ease-out; /* Instant size, then fade out */
 }
+
+
 #mic-button.active {
     background-color: var(--danger-color);
 }
 #mic-button.active:hover {
     background-color: #D32F2F;
 }
+
 #camera-button.active, #screen-button.active {
     background-color: var(--primary-color);
 }
 #camera-button.active:hover, #screen-button.active:hover {
     background-color: #388E3C;
 }
+
 /* Audio Visualizers */
 .audio-visualizers {
     display: flex;
@@ -350,6 +398,7 @@ input[type="number"] {
     flex-wrap: wrap;
     justify-content: space-around;
 }
+
 .visualizer-container {
     flex: 1;
     min-width: 280px; /* Slightly larger min-width */
@@ -361,11 +410,13 @@ input[type="number"] {
     flex-direction: column;
     gap: var(--spacing-sm);
 }
+
 .visualizer-container label {
     font-weight: bold;
     color: var(--text-secondary);
     font-size: 0.9em;
 }
+
 #input-audio-visualizer, #audio-visualizer {
     width: 100%;
     height: 20px;
@@ -375,25 +426,30 @@ input[type="number"] {
     position: relative;
     border: 1px solid var(--border-color);
 }
+
 #input-audio-visualizer .audio-bar {
     height: 100%;
     background-color: var(--primary-color); /* Green for input audio */
     width: 0%;
 }
+
 #audio-visualizer .audio-bar {
     height: 100%;
     background-color: var(--secondary-color); /* Blue for output audio */
     width: 0%;
 }
+
 /* Audio bar pulse animation */
 @keyframes audio-pulse {
     0% { transform: scaleY(1); }
     50% { transform: scaleY(1.3); } /* Slightly less aggressive pulse */
     100% { transform: scaleY(1); }
 }
+
 .audio-bar.active {
     animation: audio-pulse 0.5s infinite alternate; /* Added alternate */
 }
+
 /* Video and Screen Containers - STRICTLY from your ORIGINAL CSS */
 #video-container {
     position: fixed;
@@ -402,11 +458,13 @@ input[type="number"] {
     width: 480px; /* Original value */
     z-index: 100; /* Original value */
 }
+
 #video-container video {
     width: 100%; /* Original value */
     border-radius: 8px; /* Original value */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Original value */
 }
+
 .video-controls {
     position: absolute;
     top: 10px; /* Original value */
@@ -415,9 +473,11 @@ input[type="number"] {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
+
 #video-container:hover .video-controls {
     opacity: 1; /* Original value */
 }
+
 #stop-video {
     background: #ea4335; /* Original value */
     color: white; /* Original value */
@@ -427,9 +487,11 @@ input[type="number"] {
     cursor: pointer; /* Original value */
     transition: background-color 0.3s ease; /* Original value */
 }
+
 #stop-video:hover {
     background: #d33426; /* Original value */
 }
+
 #flip-camera {
     border: none; /* Original value */
     padding: 8px 16px; /* Original value */
@@ -437,6 +499,11 @@ input[type="number"] {
     cursor: pointer; /* Original value */
     transition: background-color 0.3s ease; /* Original value */
 }
+
+#flip-camera:hover {
+    background-color: #4285f4; /* Original value */
+}
+
 #camera-button {
     background: #4285f4; /* Original value */
     color: white; /* Original value */
@@ -449,13 +516,16 @@ input[type="number"] {
     position: relative; /* Original value */
     overflow: hidden; /* Original value */
 }
+
 #camera-button:hover {
     transform: translateY(-2px); /* Original value */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Original value */
 }
+
 #camera-button:active {
     transform: translateY(1px); /* Original value */
 }
+
 #camera-button::after {
     content: ''; /* Original value */
     position: absolute; /* Original value */
@@ -468,13 +538,16 @@ input[type="number"] {
     transform: translate(-50%, -50%); /* Original value */
     transition: width 0.3s ease, height 0.3s ease; /* Original value */
 }
+
 #camera-button:active::after {
     width: 200px; /* Original value */
     height: 200px; /* Original value */
 }
+
 #camera-button.active {
     background: #ea4335; /* Original value */
 }
+
 #frame-preview {
     position: absolute; /* Original value */
     bottom: 2px; /* Original value */
@@ -488,10 +561,12 @@ input[type="number"] {
     transition: all 0.3s ease; /* Original value */
     cursor: pointer; /* Original value */
 }
+
 #frame-preview:hover {
     transform: scale(1.1); /* Original value */
     border-color: #4285f4; /* Original value */
 }
+
 #frame-preview.enlarged {
     width: 480px; /* Original value */
     height: 360px; /* Original value */
@@ -501,6 +576,7 @@ input[type="number"] {
     z-index: 4; /* Original value */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Original value */
 }
+
 #frame-preview.enlarged::before {
     content: ''; /* Original value */
     position: fixed; /* Original value */
@@ -511,14 +587,17 @@ input[type="number"] {
     background: rgba(0, 0, 0, 0.5); /* Original value */
     z-index: -1; /* Original value */
 }
+
 /* Improve video controls visibility */
 .video-controls {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
+
 #video-container:hover .video-controls {
     opacity: 1; /* Original value */
 }
+
 #screen-button {
     background: #4285f4; /* Original value */
     color: white; /* Original value */
@@ -531,13 +610,16 @@ input[type="number"] {
     position: relative; /* Original value */
     overflow: hidden; /* Original value */
 }
+
 #screen-button:hover {
     transform: translateY(-2px); /* Original value */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Original value */
 }
+
 #screen-button:active {
     transform: translateY(1px); /* Original value */
 }
+
 #screen-button::after {
     content: ''; /* Original value */
     position: absolute; /* Original value */
@@ -550,13 +632,16 @@ input[type="number"] {
     transform: translate(-50%, -50%); /* Original value */
     transition: width 0.3s ease, height 0.3s ease; /* Original value */
 }
+
 #screen-button:active::after {
     width: 200px; /* Original value */
     height: 200px; /* Original value */
 }
+
 #screen-button.active {
     background: #ea4335; /* Original value */
 }
+
 /* Add styles for screen preview */
 #screen-container {
     position: fixed; /* Original value */
@@ -572,6 +657,7 @@ input[type="number"] {
     display: none; /* Original value */
     z-index: 1000; /* Original value */
 }
+
 #screen-preview {
     width: 100%; /* Original value */
     height: 100%; /* Original value */
@@ -579,11 +665,13 @@ input[type="number"] {
     background: #000; /* Original value */
     display: block; /* Original value */
 }
+
 /* Add hover effect */
 #screen-container:hover {
     transform: scale(1.02); /* Original value */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* Original value */
 }
+
 /* Add a close button */
 #screen-container .close-button {
     position: absolute; /* Original value */
@@ -602,27 +690,33 @@ input[type="number"] {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
+
 #screen-container:hover .close-button {
     opacity: 1; /* Original value */
 }
+
 #screen-container .close-button:hover {
     background: rgba(0, 0, 0, 0.8); /* Original value */
 }
+
 .audio-visualizers {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin: 10px 0;
 }
+
 .visualizer-container {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
+
 .visualizer-container label {
     font-size: 0.8em;
     color: #666;
 }
+
 #input-audio-visualizer,
 #audio-visualizer {
     width: 100%;
@@ -631,16 +725,19 @@ input[type="number"] {
     border-radius: 4px;
     overflow: hidden;
 }
+
 #input-audio-visualizer .audio-bar {
     height: 100%;
     background-color: #34a853; /* Green for input audio */
     width: 0%;
 }
+
 #audio-visualizer .audio-bar {
     height: 100%;
     background-color: #4285f4; /* Blue for output audio */
     width: 0%;
 }
+
 /* Update the animation for both visualizers */
 @keyframes audio-pulse {
     0% {
@@ -653,20 +750,24 @@ input[type="number"] {
         transform: scaleY(1);
     }
 }
+
 .audio-bar.active {
     animation: audio-pulse 0.5s infinite;
 }
+
 .settings {
     margin-bottom: 10px;
     display: flex;
     gap: 10px;
 }
+
 #api-key {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 300px;
 }
+
 #voice-select, #response-type-select{ /* Corrected selector */
     padding: 4px;
     border: 1px solid #ccc;
@@ -681,6 +782,7 @@ input[type="number"] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: none;
 }
+
 #config-container.active {
     display: block;
 }
@@ -699,25 +801,30 @@ input[type="number"] {
     cursor: pointer;
     transition: all 0.2s ease;
 }
+
 #apply-config:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 #system-instruction {
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md); /* Use new variable */
     font-size: 14px;
 }
+
 /* Responsive styles */
 @media (max-width: 768px) {
     #app {
         padding: var(--spacing-sm);
         width: 96%;
     }
+
     .hidden-mobile {
         display: none;
     }
+
     #config-container {
         position: fixed;
         top: 0;
@@ -732,15 +839,19 @@ input[type="number"] {
         background: var(--surface-color);
         padding: var(--spacing-lg);
     }
+
     #config-container.active {
         transform: translateX(0);
     }
+
     .logs-wrapper { /* This class is not in your HTML, consider removing if unused */
         max-height: 30vh;
     }
+
     #logs-container {
         max-height: calc(30vh - 50px);
     }
+
     .input-controls {
         position: sticky;
         bottom: 0;
@@ -749,16 +860,19 @@ input[type="number"] {
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
         z-index: 100;
     }
+
     .action-buttons { /* This class is not in your HTML, consider removing if unused */
         flex-wrap: wrap;
         justify-content: center;
     }
+
     #video-container {
         width: 60%;
         max-height: 40vh;
         bottom: 0;
         right: 0;
     }
+
     #screen-container {
         width: 100%;
         height: 50vh;
@@ -767,15 +881,19 @@ input[type="number"] {
         right: auto;
     }
 }
+
 .setting-container {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
 }
+
 .setting-label {
     font-size: 12px;
     font-weight: bold;
 }
+
+
 .fps-help {
     color: #666;
     font-size: 12px;
