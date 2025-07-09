@@ -34,7 +34,7 @@ const configToggle = document.getElementById('config-toggle');
 const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
 // 确保系统指令被硬编码并显示
-systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
+systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
 
 const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
@@ -465,7 +465,7 @@ async function handleVideoToggle() {
             }
             
             // videoManager.start 内部应该会设置 preview.srcObject
-            await videoManager.start(fpsInput.value,(frameData) => {
+            await videoManager.start(fpsInput.value,(frameData, originalWidth, originalHeight) => {
                 if (isConnected) {
                     client.sendRealtimeInput([frameData]);
                 }
@@ -640,3 +640,183 @@ function stopScreenSharing() {
 
 screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
+
+
+// --- Draggable and Resizable Logic ---
+let activeZIndex = 1000; // Base z-index for fixed elements
+
+/**
+ * Makes an HTML element draggable and resizable.
+ * @param {HTMLElement} element - The element to make draggable/resizable.
+ * @param {HTMLElement} [videoElement] - Optional: The inner video element to ensure it fills the container.
+ * @param {number} [minWidth=200] - Minimum width for resizing.
+ * @param {number} [minHeight=150] - Minimum height for resizing.
+ */
+function makeDraggableAndResizable(element, videoElement, minWidth = 200, minHeight = 150) {
+    let isDragging = false;
+    let isResizing = false;
+    let currentHandle = null;
+    let initialX, initialY, initialWidth, initialHeight, initialLeft, initialTop;
+
+    const handles = element.querySelectorAll('.resize-handle');
+
+    // Make draggable - listen on the element itself (excluding handles)
+    element.addEventListener('mousedown', dragStart);
+    element.addEventListener('touchstart', dragStart, { passive: false });
+
+    // Make resizable - listen on the handles
+    handles.forEach(handle => {
+        handle.addEventListener('mousedown', resizeStart);
+        handle.addEventListener('touchstart', resizeStart, { passive: false });
+    });
+
+    // Bring element to front on any interaction (click, drag, resize)
+    element.addEventListener('mousedown', bringToFront);
+    element.addEventListener('touchstart', bringToFront, { passive: false });
+
+    function getEventCoords(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function bringToFront() {
+        // Increment z-index for the active element
+        element.style.zIndex = ++activeZIndex;
+    }
+
+    function dragStart(e) {
+        // If clicking on a resize handle, don't start dragging
+        if (e.target.classList.contains('resize-handle')) {
+            return;
+        }
+
+        e.preventDefault(); // Prevent default browser drag behavior (e.g., image drag)
+        isDragging = true;
+        element.classList.add('dragging');
+
+        const coords = getEventCoords(e);
+        initialX = coords.x;
+        initialY = coords.y;
+        initialLeft = element.offsetLeft;
+        initialTop = element.offsetTop;
+
+        // Add listeners to document to capture events even if mouse leaves the element
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+    }
+
+    function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const coords = getEventCoords(e);
+        const dx = coords.x - initialX;
+        const dy = coords.y - initialY;
+
+        // Calculate new position, clamping to viewport boundaries
+        const newLeft = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, initialLeft + dx));
+        const newTop = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, initialTop + dy));
+
+        element.style.left = `${newLeft}px`;
+        element.style.top = `${newTop}px`;
+    }
+
+    function dragEnd() {
+        isDragging = false;
+        element.classList.remove('dragging');
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchmove', drag);
+        document.removeEventListener('touchend', dragEnd);
+    }
+
+    function resizeStart(e) {
+        e.preventDefault(); // Prevent default browser drag behavior (e.g., text selection)
+        isResizing = true;
+        currentHandle = e.target;
+        element.classList.add('resizing');
+
+        const coords = getEventCoords(e);
+        initialX = coords.x;
+        initialY = coords.y;
+        initialWidth = element.offsetWidth;
+        initialHeight = element.offsetHeight;
+        initialLeft = element.offsetLeft;
+        initialTop = element.offsetTop;
+
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', resizeEnd);
+        document.addEventListener('touchmove', resize, { passive: false });
+        document.addEventListener('touchend', resizeEnd);
+    }
+
+    function resize(e) {
+        if (!isResizing) return;
+        e.preventDefault();
+
+        const coords = getEventCoords(e);
+        const dx = coords.x - initialX;
+        const dy = coords.y - initialY;
+
+        let newWidth = initialWidth;
+        let newHeight = initialHeight;
+        let newLeft = initialLeft;
+        let newTop = initialTop;
+
+        const handleClass = currentHandle.classList;
+
+        if (handleClass.contains('bottom-right')) {
+            newWidth = Math.max(minWidth, initialWidth + dx);
+            newHeight = Math.max(minHeight, initialHeight + dy);
+        } else if (handleClass.contains('bottom-left')) {
+            newWidth = Math.max(minWidth, initialWidth - dx);
+            newHeight = Math.max(minHeight, initialHeight + dy);
+            newLeft = initialLeft + dx;
+        } else if (handleClass.contains('top-right')) {
+            newWidth = Math.max(minWidth, initialWidth + dx);
+            newHeight = Math.max(minHeight, initialHeight - dy);
+            newTop = initialTop + dy;
+        } else if (handleClass.contains('top-left')) {
+            newWidth = Math.max(minWidth, initialWidth - dx);
+            newHeight = Math.max(minHeight, initialHeight - dy);
+            newLeft = initialLeft + dx;
+            newTop = initialTop + dy;
+        } else if (handleClass.contains('left')) {
+            newWidth = Math.max(minWidth, initialWidth - dx);
+            newLeft = initialLeft + dx;
+        } else if (handleClass.contains('right')) {
+            newWidth = Math.max(minWidth, initialWidth + dx);
+        } else if (handleClass.contains('top')) {
+            newHeight = Math.max(minHeight, initialHeight - dy);
+            newTop = initialTop + dy;
+        } else if (handleClass.contains('bottom')) {
+            newHeight = Math.max(minHeight, initialHeight + dy);
+        }
+
+        // Apply new dimensions and position, clamping to viewport
+        element.style.width = `${Math.min(window.innerWidth - newLeft, newWidth)}px`;
+        element.style.height = `${Math.min(window.innerHeight - newTop, newHeight)}px`;
+        element.style.left = `${newLeft}px`;
+        element.style.top = `${newTop}px`;
+
+        // The video element inside will adjust automatically due to CSS (width: 100%; height: 100%; object-fit: contain;)
+    }
+
+    function resizeEnd() {
+        isResizing = false;
+        currentHandle = null;
+        element.classList.remove('resizing');
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', resizeEnd);
+        document.removeEventListener('touchmove', resize);
+        document.removeEventListener('touchend', resizeEnd);
+    }
+}
+
+// Apply draggable and resizable to video and screen containers
+makeDraggableAndResizable(videoContainer, preview);
+makeDraggableAndResizable(screenContainer, screenPreview);
