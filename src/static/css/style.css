@@ -461,7 +461,7 @@ input[type="number"] {
 
 /* Video and Screen Containers - Now draggable and resizable */
 #video-container, #screen-container {
-    position: fixed;
+    position: fixed; /* Crucial for dragging */
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -509,7 +509,7 @@ input[type="number"] {
     position: absolute;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    z-index: 1001; /* Above video content but below handles */
+    z-index: 1003; /* Increased z-index to be above resize handles (1002) */
     display: flex;
     gap: var(--spacing-xs);
     opacity: 0; /* Hidden by default on desktop */
@@ -551,14 +551,14 @@ input[type="number"] {
 /* Small frame preview canvas */
 #frame-preview {
     position: absolute;
-    bottom: var(--spacing-xs);
-    right: var(--spacing-xs);
-    width: 120px;
+    bottom: var(--spacing-xs); /* Use spacing variable */
+    right: var(--spacing-xs); /* Use spacing variable */
+    width: 120px; /* Fixed size for small preview */
     height: 90px;
     border: 2px solid rgba(66, 133, 244, 0.8);
     border-radius: 4px;
     background: #000;
-    z-index: 1001;
+    z-index: 1001; /* Still below controls and handles */
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -574,7 +574,7 @@ input[type="number"] {
     bottom: 50%;
     right: 50%;
     transform: translate(50%, 50%);
-    z-index: 1003;
+    z-index: 1004; /* Increased z-index to be on top of everything when enlarged */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -586,7 +586,7 @@ input[type="number"] {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1002;
+    z-index: 1003; /* Overlay below enlarged preview but above other elements */
 }
 
 /* Screen container close button */
@@ -607,7 +607,7 @@ input[type="number"] {
     opacity: 0; /* Hidden by default on desktop */
     transition: opacity 0.3s ease, background-color 0.3s ease;
     font-size: 1.3em;
-    z-index: 1001;
+    z-index: 1003; /* Increased z-index to be above resize handles (1002) */
 }
 
 #screen-container:hover .close-button {
@@ -626,7 +626,7 @@ input[type="number"] {
     background-color: rgba(var(--secondary-color-rgb), 0.8);
     border: 1px solid white;
     border-radius: 2px;
-    z-index: 1002;
+    z-index: 1002; /* Still below controls (1003) but above video content */
     opacity: 0;
     transition: opacity 0.2s ease;
 }
