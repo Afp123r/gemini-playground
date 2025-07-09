@@ -18,7 +18,6 @@
     --spacing-lg: 24px;
     --primary-color-rgb: 76, 175, 80; /* RGB for primary color */
 }
-
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     justify-content: center;
@@ -31,7 +30,6 @@ body {
     padding: var(--spacing-lg); /* Add padding to body */
     box-sizing: border-box; /* Include padding in element's total width and height */
 }
-
 #app {
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
@@ -43,7 +41,6 @@ body {
     flex-direction: column;
     gap: var(--spacing-md); /* Consistent spacing between sections */
 }
-
 /* Header Bar for API Key and Settings Toggle */
 .header-bar {
     display: flex;
@@ -51,7 +48,6 @@ body {
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
 }
-
 #api-key {
     flex-grow: 1;
     padding: 12px 15px;
@@ -63,17 +59,14 @@ body {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
 #api-key::placeholder {
     color: var(--text-secondary);
 }
-
 #api-key:focus {
     border-color: var(--primary-color);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
     outline: none;
 }
-
 /* Config Toggle Button */
 #config-toggle {
     background-color: var(--secondary-color);
@@ -86,17 +79,14 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
-
 #config-toggle:hover {
     background-color: #1976D2; /* Darker blue on hover */
     transform: translateY(-1px);
 }
-
 #config-toggle.active {
     background-color: var(--primary-color); /* Green when active */
     transform: rotate(90deg);
 }
-
 /* Configuration Container */
 #config-container {
     background-color: #F0F0F0; /* Slightly darker surface for config */
@@ -110,32 +100,27 @@ body {
     opacity: 0;
     transform: translateY(-10px);
 }
-
 #config-container.active {
     max-height: 500px; /* Adjust based on content height */
     opacity: 1;
     transform: translateY(0);
 }
-
 .config-wrapper {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
 }
-
 .setting-container {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
 }
-
 .setting-label {
     font-weight: bold;
     color: var(--text-secondary);
     min-width: 90px; /* Align labels */
 }
-
 select, textarea, input[type="number"] {
     flex-grow: 1;
     padding: 10px 12px;
@@ -148,29 +133,24 @@ select, textarea, input[type="number"] {
     transition: border-color 0.3s ease;
     min-width: 150px;
 }
-
 select:focus, textarea:focus, input[type="number"]:focus {
     border-color: var(--primary-color);
     outline: none;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
 }
-
 textarea {
     resize: vertical;
     min-height: 100px; /* Slightly larger textarea */
 }
-
 input[type="number"] {
     width: 80px;
     text-align: center;
 }
-
 .fps-help {
     font-size: 0.85em;
     color: var(--text-secondary);
     margin-left: var(--spacing-sm);
 }
-
 #apply-config {
     background-color: var(--primary-color);
     color: white;
@@ -184,12 +164,10 @@ input[type="number"] {
     box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.3);
     align-self: flex-end;
 }
-
 #apply-config:hover {
     background-color: #388E3C; /* Darker green on hover */
     transform: translateY(-2px);
 }
-
 /* Connect Button */
 #connect-button {
     background-color: var(--secondary-color);
@@ -204,29 +182,24 @@ input[type="number"] {
     box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3); /* Shadow for blue button */
     width: 100%;
 }
-
 #connect-button:hover {
     background-color: #1976D2;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
 }
-
 #connect-button.connected {
     background-color: var(--danger-color);
     box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3); /* Shadow for red button */
 }
-
 #connect-button.connected:hover {
     background-color: #D32F2F;
 }
-
 #connect-button:disabled {
     background-color: #B0B0B0; /* Lighter grey for disabled */
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
-
 /* Log Container */
 #logs-container {
     border: 1px solid var(--border-color);
@@ -241,11 +214,9 @@ input[type="number"] {
     flex-direction: column;
     gap: var(--spacing-sm);
 }
-
 #logs-container:hover {
     box-shadow: 0 4px 15px var(--shadow-color);
 }
-
 .log-entry {
     display: flex;
     align-items: flex-start;
@@ -255,37 +226,31 @@ input[type="number"] {
     font-size: 0.95em;
     line-height: 1.5;
 }
-
 .log-entry.system {
     background-color: #E8F5E9; /* Light green */
     color: #388E3C; /* Dark green text */
 }
-
 .log-entry.user {
     background-color: #E3F2FD; /* Light blue */
     color: #1976D2; /* Dark blue text */
     align-self: flex-end; /* User messages align right */
     max-width: 80%;
 }
-
 .log-entry.ai {
     background-color: #FFEBEE; /* Light red */
     color: #D32F2F; /* Dark red text */
     align-self: flex-start; /* AI messages align left */
     max-width: 80%;
 }
-
 .log-entry .timestamp {
     font-size: 0.8em;
     color: var(--text-secondary);
     white-space: nowrap;
 }
-
 .log-entry .emoji {
     font-size: 1.1em;
     line-height: 1;
 }
-
 /* Input Controls (Message Input & Buttons) */
 .input-controls {
     display: flex;
@@ -293,7 +258,6 @@ input[type="number"] {
     align-items: stretch;
     flex-wrap: wrap;
 }
-
 #message-input {
     flex-grow: 1;
     padding: 12px 15px;
@@ -305,23 +269,19 @@ input[type="number"] {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
     min-width: 150px;
 }
-
 #message-input::placeholder {
     color: var(--text-secondary);
 }
-
 #message-input:focus {
     border-color: var(--secondary-color);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(33, 150, 243, 0.2);
     outline: none;
 }
-
 #message-input:disabled {
     background-color: #E0E0E0;
     cursor: not-allowed;
     color: #B0B0B0;
 }
-
 .input-controls button {
     background-color: var(--secondary-color);
     color: white;
@@ -339,19 +299,16 @@ input[type="number"] {
     position: relative;
     overflow: hidden; /* For ripple effect */
 }
-
 .input-controls button:hover {
     background-color: #1976D2;
     transform: translateY(-1px);
 }
-
 .input-controls button:disabled {
     background-color: #B0B0B0;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
-
 /* Button Ripple Effect */
 .input-controls button::after {
     content: '';
@@ -367,29 +324,24 @@ input[type="number"] {
     pointer-events: none;
     opacity: 0; /* Start hidden */
 }
-
 .input-controls button:active::after {
     width: 200px;
     height: 200px;
     opacity: 1; /* Fade in on active */
     transition: width 0.0s, height 0.0s, opacity 0.3s ease-out; /* Instant size, then fade out */
 }
-
-
 #mic-button.active {
     background-color: var(--danger-color);
 }
 #mic-button.active:hover {
     background-color: #D32F2F;
 }
-
 #camera-button.active, #screen-button.active {
     background-color: var(--primary-color);
 }
 #camera-button.active:hover, #screen-button.active:hover {
     background-color: #388E3C;
 }
-
 /* Audio Visualizers */
 .audio-visualizers {
     display: flex;
@@ -398,7 +350,6 @@ input[type="number"] {
     flex-wrap: wrap;
     justify-content: space-around;
 }
-
 .visualizer-container {
     flex: 1;
     min-width: 280px; /* Slightly larger min-width */
@@ -410,13 +361,11 @@ input[type="number"] {
     flex-direction: column;
     gap: var(--spacing-sm);
 }
-
 .visualizer-container label {
     font-weight: bold;
     color: var(--text-secondary);
     font-size: 0.9em;
 }
-
 #input-audio-visualizer, #audio-visualizer {
     width: 100%;
     height: 20px;
@@ -426,30 +375,25 @@ input[type="number"] {
     position: relative;
     border: 1px solid var(--border-color);
 }
-
 #input-audio-visualizer .audio-bar {
     height: 100%;
     background-color: var(--primary-color); /* Green for input audio */
     width: 0%;
 }
-
 #audio-visualizer .audio-bar {
     height: 100%;
     background-color: var(--secondary-color); /* Blue for output audio */
     width: 0%;
 }
-
 /* Audio bar pulse animation */
 @keyframes audio-pulse {
     0% { transform: scaleY(1); }
     50% { transform: scaleY(1.3); } /* Slightly less aggressive pulse */
     100% { transform: scaleY(1); }
 }
-
 .audio-bar.active {
     animation: audio-pulse 0.5s infinite alternate; /* Added alternate */
 }
-
 /* Video and Screen Containers - STRICTLY from your ORIGINAL CSS */
 #video-container {
     position: fixed;
@@ -458,13 +402,11 @@ input[type="number"] {
     width: 480px; /* Original value */
     z-index: 100; /* Original value */
 }
-
 #video-container video {
     width: 100%; /* Original value */
     border-radius: 8px; /* Original value */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Original value */
 }
-
 .video-controls {
     position: absolute;
     top: 10px; /* Original value */
@@ -473,11 +415,9 @@ input[type="number"] {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
-
 #video-container:hover .video-controls {
     opacity: 1; /* Original value */
 }
-
 #stop-video {
     background: #ea4335; /* Original value */
     color: white; /* Original value */
@@ -487,11 +427,9 @@ input[type="number"] {
     cursor: pointer; /* Original value */
     transition: background-color 0.3s ease; /* Original value */
 }
-
 #stop-video:hover {
     background: #d33426; /* Original value */
 }
-
 #flip-camera {
     border: none; /* Original value */
     padding: 8px 16px; /* Original value */
@@ -499,7 +437,6 @@ input[type="number"] {
     cursor: pointer; /* Original value */
     transition: background-color 0.3s ease; /* Original value */
 }
-
 #camera-button {
     background: #4285f4; /* Original value */
     color: white; /* Original value */
@@ -512,16 +449,13 @@ input[type="number"] {
     position: relative; /* Original value */
     overflow: hidden; /* Original value */
 }
-
 #camera-button:hover {
     transform: translateY(-2px); /* Original value */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Original value */
 }
-
 #camera-button:active {
     transform: translateY(1px); /* Original value */
 }
-
 #camera-button::after {
     content: ''; /* Original value */
     position: absolute; /* Original value */
@@ -534,16 +468,13 @@ input[type="number"] {
     transform: translate(-50%, -50%); /* Original value */
     transition: width 0.3s ease, height 0.3s ease; /* Original value */
 }
-
 #camera-button:active::after {
     width: 200px; /* Original value */
     height: 200px; /* Original value */
 }
-
 #camera-button.active {
     background: #ea4335; /* Original value */
 }
-
 #frame-preview {
     position: absolute; /* Original value */
     bottom: 2px; /* Original value */
@@ -557,12 +488,10 @@ input[type="number"] {
     transition: all 0.3s ease; /* Original value */
     cursor: pointer; /* Original value */
 }
-
 #frame-preview:hover {
     transform: scale(1.1); /* Original value */
     border-color: #4285f4; /* Original value */
 }
-
 #frame-preview.enlarged {
     width: 480px; /* Original value */
     height: 360px; /* Original value */
@@ -572,7 +501,6 @@ input[type="number"] {
     z-index: 4; /* Original value */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Original value */
 }
-
 #frame-preview.enlarged::before {
     content: ''; /* Original value */
     position: fixed; /* Original value */
@@ -583,17 +511,14 @@ input[type="number"] {
     background: rgba(0, 0, 0, 0.5); /* Original value */
     z-index: -1; /* Original value */
 }
-
 /* Improve video controls visibility */
 .video-controls {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
-
 #video-container:hover .video-controls {
     opacity: 1; /* Original value */
 }
-
 #screen-button {
     background: #4285f4; /* Original value */
     color: white; /* Original value */
@@ -606,16 +531,13 @@ input[type="number"] {
     position: relative; /* Original value */
     overflow: hidden; /* Original value */
 }
-
 #screen-button:hover {
     transform: translateY(-2px); /* Original value */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Original value */
 }
-
 #screen-button:active {
     transform: translateY(1px); /* Original value */
 }
-
 #screen-button::after {
     content: ''; /* Original value */
     position: absolute; /* Original value */
@@ -628,16 +550,13 @@ input[type="number"] {
     transform: translate(-50%, -50%); /* Original value */
     transition: width 0.3s ease, height 0.3s ease; /* Original value */
 }
-
 #screen-button:active::after {
     width: 200px; /* Original value */
     height: 200px; /* Original value */
 }
-
 #screen-button.active {
     background: #ea4335; /* Original value */
 }
-
 /* Add styles for screen preview */
 #screen-container {
     position: fixed; /* Original value */
@@ -653,7 +572,6 @@ input[type="number"] {
     display: none; /* Original value */
     z-index: 1000; /* Original value */
 }
-
 #screen-preview {
     width: 100%; /* Original value */
     height: 100%; /* Original value */
@@ -661,13 +579,11 @@ input[type="number"] {
     background: #000; /* Original value */
     display: block; /* Original value */
 }
-
 /* Add hover effect */
 #screen-container:hover {
     transform: scale(1.02); /* Original value */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* Original value */
 }
-
 /* Add a close button */
 #screen-container .close-button {
     position: absolute; /* Original value */
@@ -686,33 +602,27 @@ input[type="number"] {
     opacity: 0; /* Original value */
     transition: opacity 0.3s ease; /* Original value */
 }
-
 #screen-container:hover .close-button {
     opacity: 1; /* Original value */
 }
-
 #screen-container .close-button:hover {
     background: rgba(0, 0, 0, 0.8); /* Original value */
 }
-
 .audio-visualizers {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin: 10px 0;
 }
-
 .visualizer-container {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
-
 .visualizer-container label {
     font-size: 0.8em;
     color: #666;
 }
-
 #input-audio-visualizer,
 #audio-visualizer {
     width: 100%;
@@ -721,19 +631,16 @@ input[type="number"] {
     border-radius: 4px;
     overflow: hidden;
 }
-
 #input-audio-visualizer .audio-bar {
     height: 100%;
     background-color: #34a853; /* Green for input audio */
     width: 0%;
 }
-
 #audio-visualizer .audio-bar {
     height: 100%;
     background-color: #4285f4; /* Blue for output audio */
     width: 0%;
 }
-
 /* Update the animation for both visualizers */
 @keyframes audio-pulse {
     0% {
@@ -746,24 +653,20 @@ input[type="number"] {
         transform: scaleY(1);
     }
 }
-
 .audio-bar.active {
     animation: audio-pulse 0.5s infinite;
 }
-
 .settings {
     margin-bottom: 10px;
     display: flex;
     gap: 10px;
 }
-
 #api-key {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 300px;
 }
-
 #voice-select, #response-type-select{ /* Corrected selector */
     padding: 4px;
     border: 1px solid #ccc;
@@ -778,7 +681,6 @@ input[type="number"] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: none;
 }
-
 #config-container.active {
     display: block;
 }
@@ -797,30 +699,25 @@ input[type="number"] {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 #apply-config:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 #system-instruction {
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md); /* Use new variable */
     font-size: 14px;
 }
-
 /* Responsive styles */
 @media (max-width: 768px) {
     #app {
         padding: var(--spacing-sm);
         width: 96%;
     }
-
     .hidden-mobile {
         display: none;
     }
-
     #config-container {
         position: fixed;
         top: 0;
@@ -835,19 +732,15 @@ input[type="number"] {
         background: var(--surface-color);
         padding: var(--spacing-lg);
     }
-
     #config-container.active {
         transform: translateX(0);
     }
-
     .logs-wrapper { /* This class is not in your HTML, consider removing if unused */
         max-height: 30vh;
     }
-
     #logs-container {
         max-height: calc(30vh - 50px);
     }
-
     .input-controls {
         position: sticky;
         bottom: 0;
@@ -856,19 +749,16 @@ input[type="number"] {
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
         z-index: 100;
     }
-
     .action-buttons { /* This class is not in your HTML, consider removing if unused */
         flex-wrap: wrap;
         justify-content: center;
     }
-
     #video-container {
         width: 60%;
         max-height: 40vh;
         bottom: 0;
         right: 0;
     }
-
     #screen-container {
         width: 100%;
         height: 50vh;
@@ -877,670 +767,16 @@ input[type="number"] {
         right: auto;
     }
 }
-
 .setting-container {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
 }
-
 .setting-label {
     font-size: 12px;
     font-weight: bold;
 }
-
-
 .fps-help {
     color: #666;
     font-size: 12px;
-}```
-
----
-
-### **3. `js/main.js` (保持您目前最新的、包含视频清理逻辑的版本)**
-
-请继续使用我之前提供的 `main.js` 代码，因为它包含了对视频流进行停止和清理的 JavaScript 逻辑。
-
-```javascript
-import { MultimodalLiveClient } from './core/websocket-client.js';
-import { AudioStreamer } => './audio/audio-streamer.js';
-import { AudioRecorder } from './audio/audio-recorder.js';
-import { CONFIG } from './config/config.js';
-import { Logger } from './utils/logger.js';
-import { VideoManager } from './video/video-manager.js';
-import { ScreenRecorder } from './video/screen-recorder.js';
-
-/**
- * @fileoverview Main entry point for the application.
- * Initializes and manages the UI, audio, video, and WebSocket interactions.
- */
-
-// DOM Elements
-const logsContainer = document.getElementById('logs-container');
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-const micButton = document.getElementById('mic-button');
-const micIcon = document.getElementById('mic-icon');
-const audioVisualizer = document.getElementById('audio-visualizer');
-const connectButton = document.getElementById('connect-button');
-const cameraButton = document.getElementById('camera-button');
-const cameraIcon = document.getElementById('camera-icon');
-const stopVideoButton = document.getElementById('stop-video');
-const screenButton = document.getElementById('screen-button');
-const screenIcon = document.getElementById('screen-icon');
-const screenContainer = document.getElementById('screen-container');
-const screenPreview = document.getElementById('screen-preview');
-const inputAudioVisualizer = document.getElementById('input-audio-visualizer');
-const apiKeyInput = document.getElementById('api-key');
-const voiceSelect = document.getElementById('voice-select');
-const fpsInput = document.getElementById('fps-input');
-const configToggle = document.getElementById('config-toggle');
-const configContainer = document.getElementById('config-container');
-const systemInstructionInput = document.getElementById('system-instruction');
-// 确保系统指令被硬编码并显示
-systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
-
-const applyConfigButton = document.getElementById('apply-config');
-const responseTypeSelect = document.getElementById('response-type-select');
-const languageSelect = document.getElementById('language-select');
-
-// 获取视频容器和视频元素
-const videoContainer = document.getElementById('video-container');
-const preview = document.getElementById('preview');
-
-
-// Load saved values from localStorage
-const savedApiKey = localStorage.getItem('gemini_api_key');
-const savedVoice = localStorage.getItem('gemini_voice');
-const savedFPS = localStorage.getItem('video_fps');
-const savedLanguage = localStorage.getItem('gemini_language');
-
-if (savedApiKey) {
-    apiKeyInput.value = savedApiKey;
 }
-if (savedVoice) {
-    voiceSelect.value = savedVoice;
-}
-if (savedFPS) {
-    fpsInput.value = savedFPS;
-}
-if (savedLanguage) {
-    languageSelect.value = savedLanguage;
-}
-
-
-// Handle configuration panel toggle
-configToggle.addEventListener('click', () => {
-    configContainer.classList.toggle('active');
-    configToggle.classList.toggle('active');
-});
-
-applyConfigButton.addEventListener('click', () => {
-    configContainer.classList.toggle('active');
-    configToggle.classList.toggle('active');
-});
-
-// State variables
-let isRecording = false;
-let audioStreamer = null;
-let audioCtx = null;
-let isConnected = false;
-let audioRecorder = null;
-let isVideoActive = false;
-let videoManager = null;
-let isScreenSharing = false;
-let screenRecorder = null;
-let isUsingTool = false;
-
-// Multimodal Client
-const client = new MultimodalLiveClient();
-
-/**
- * Logs a message to the UI.
- * @param {string} message - The message to log.
- * @param {string} [type='system'] - The type of the message (system, user, ai).
- */
-function logMessage(message, type = 'system') {
-    const logEntry = document.createElement('div');
-    logEntry.classList.add('log-entry', type);
-
-    const timestamp = document.createElement('span');
-    timestamp.classList.add('timestamp');
-    timestamp.textContent = new Date().toLocaleTimeString();
-    logEntry.appendChild(timestamp);
-
-    const emoji = document.createElement('span');
-    emoji.classList.add('emoji');
-    switch (type) {
-        case 'system':
-            emoji.textContent = '⚙️';
-            break;
-        case 'user':
-            emoji.textContent = '🫵';
-            break;
-        case 'ai':
-            emoji.textContent = '🤖';
-            break;
-    }
-    logEntry.appendChild(emoji);
-
-    const messageText = document.createElement('span');
-    messageText.textContent = message;
-    logEntry.appendChild(messageText);
-
-    logsContainer.appendChild(logEntry);
-    logsContainer.scrollTop = logsContainer.scrollHeight;
-}
-
-/**
- * Updates the microphone icon based on the recording state.
- */
-function updateMicIcon() {
-    micIcon.textContent = isRecording ? 'mic_off' : 'mic';
-    micButton.style.backgroundColor = isRecording ? '#ea4335' : '#4285f4';
-}
-
-/**
- * Updates the audio visualizer based on the audio volume.
- * @param {number} volume - The audio volume (0.0 to 1.0).
- * @param {boolean} [isInput=false] - Whether the visualizer is for input audio.
- */
-function updateAudioVisualizer(volume, isInput = false) {
-    const visualizer = isInput ? inputAudioVisualizer : audioVisualizer;
-    const audioBar = visualizer.querySelector('.audio-bar') || document.createElement('div');
-    
-    if (!visualizer.contains(audioBar)) {
-        audioBar.classList.add('audio-bar');
-        visualizer.appendChild(audioBar);
-    }
-    
-    audioBar.style.width = `${volume * 100}%`;
-    if (volume > 0) {
-        audioBar.classList.add('active');
-    } else {
-        audioBar.classList.remove('active');
-    }
-}
-
-/**
- * Initializes the audio context and streamer if not already initialized.
- * @returns {Promise<AudioStreamer>} The audio streamer instance.
- */
-async function ensureAudioInitialized() {
-    if (!audioCtx) {
-        audioCtx = new AudioContext();
-    }
-    if (!audioStreamer) {
-        audioStreamer = new AudioStreamer(audioCtx);
-        await audioStreamer.addWorklet('vumeter-out', 'js/audio/worklets/vol-meter.js', (ev) => {
-            updateAudioVisualizer(ev.data.volume);
-        });
-    }
-    return audioStreamer;
-}
-
-/**
- * Handles the microphone toggle. Starts or stops audio recording.
- * @returns {Promise<void>}
- */
-async function handleMicToggle() {
-    if (!isRecording) {
-        try {
-            await ensureAudioInitialized();
-            audioRecorder = new AudioRecorder();
-            
-            const inputAnalyser = audioCtx.createAnalyser();
-            inputAnalyser.fftSize = 256;
-            const inputDataArray = new Uint8Array(inputAnalyser.frequencyBinCount);
-            
-            await audioRecorder.start((base64Data) => {
-                if (isUsingTool) {
-                    client.sendRealtimeInput([{
-                        mimeType: "audio/pcm;rate=16000",
-                        data: base64Data,
-                        interrupt: true     // Model isn't interruptable when using tools, so we do it manually
-                    }]);
-                } else {
-                    client.sendRealtimeInput([{
-                        mimeType: "audio/pcm;rate=16000",
-                        data: base64Data
-                    }]);
-                }
-                
-                inputAnalyser.getByteFrequencyData(inputDataArray);
-                const inputVolume = Math.max(...inputDataArray) / 255;
-                updateAudioVisualizer(inputVolume, true);
-            });
-
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const source = audioCtx.createMediaStreamSource(stream);
-            source.connect(inputAnalyser);
-            
-            await audioStreamer.resume();
-            isRecording = true;
-            Logger.info('Microphone started');
-            logMessage('Microphone started', 'system');
-            updateMicIcon();
-        } catch (error) {
-            Logger.error('Microphone error:', error);
-            logMessage(`Error: ${error.message}`, 'system');
-            isRecording = false;
-            updateMicIcon();
-        }
-    } else {
-        if (audioRecorder && isRecording) {
-            audioRecorder.stop();
-        }
-        isRecording = false;
-        logMessage('Microphone stopped', 'system');
-        updateMicIcon();
-        updateAudioVisualizer(0, true);
-    }
-}
-
-/**
- * Resumes the audio context if it's suspended.
- * @returns {Promise<void>}
- */
-async function resumeAudioContext() {
-    if (audioCtx && audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-    }
-}
-
-/**
- * Connects to the WebSocket server.
- * @returns {Promise<void>}
- */
-async function connectToWebsocket() {
-    if (!apiKeyInput.value) {
-        logMessage('Please input API Key', 'system');
-        return;
-    }
-
-    // Save values to localStorage
-    localStorage.setItem('gemini_api_key', apiKeyInput.value);
-    localStorage.setItem('gemini_voice', voiceSelect.value);
-    localStorage.setItem('gemini_language', languageSelect.value);
-
-    const config = {
-        model: CONFIG.API.MODEL_NAME,
-        generationConfig: {
-            responseModalities: responseTypeSelect.value,
-            speechConfig: {
-				languageCode: languageSelect.value,
-                voiceConfig: { 
-                    prebuiltVoiceConfig: { 
-                        voiceName: voiceSelect.value
-                    }
-                }
-            },
-
-        },
-        systemInstruction: {
-            parts: [{
-                // 硬编码系统指令在这里，确保它始终被发送给 API
-                text: "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。"
-            }],
-        }
-    };  
-
-    try {
-        await client.connect(config,apiKeyInput.value);
-        isConnected = true;
-        await resumeAudioContext();
-        connectButton.textContent = 'Disconnect';
-        connectButton.classList.add('connected');
-        messageInput.disabled = false;
-        sendButton.disabled = false;
-        micButton.disabled = false;
-        cameraButton.disabled = false;
-        screenButton.disabled = false;
-        logMessage('Connected to Gemini 2.0 Flash Multimodal Live API', 'system');
-    } catch (error) {
-        const errorMessage = error.message || 'Unknown error';
-        Logger.error('Connection error:', error);
-        logMessage(`Connection error: ${errorMessage}`, 'system');
-        isConnected = false;
-        connectButton.textContent = 'Connect';
-        connectButton.classList.remove('connected');
-        messageInput.disabled = true;
-        sendButton.disabled = true;
-        micButton.disabled = true;
-        cameraButton.disabled = true;
-        screenButton.disabled = true;
-    }
-}
-
-/**
- * Disconnects from the WebSocket server.
- */
-function disconnectFromWebsocket() {
-    client.disconnect();
-    isConnected = false;
-    if (audioStreamer) {
-        audioStreamer.stop();
-        if (audioRecorder) {
-            audioRecorder.stop();
-            audioRecorder = null;
-        }
-        isRecording = false;
-        updateMicIcon();
-    }
-    connectButton.textContent = 'Connect';
-    connectButton.classList.remove('connected');
-    messageInput.disabled = true;
-    sendButton.disabled = true;
-    micButton.disabled = true;
-    cameraButton.disabled = true;
-    screenButton.disabled = true;
-    logMessage('Disconnected from server', 'system');
-    
-    // 确保在断开连接时停止并清除视频/屏幕共享
-    if (videoManager) {
-        stopVideo();
-    }
-    
-    if (screenRecorder) {
-        stopScreenSharing();
-    }
-}
-
-/**
- * Handles sending a text message.
- */
-function handleSendMessage() {
-    const message = messageInput.value.trim();
-    if (message) {
-        logMessage(message, 'user');
-        client.send({ text: message });
-        messageInput.value = '';
-    }
-}
-
-// Event Listeners
-client.on('open', () => {
-    logMessage('WebSocket connection opened', 'system');
-});
-
-client.on('log', (log) => {
-    logMessage(`${log.type}: ${JSON.stringify(log.message)}`, 'system');
-});
-
-client.on('close', (event) => {
-    logMessage(`WebSocket connection closed (code ${event.code})`, 'system');
-});
-
-client.on('audio', async (data) => {
-    try {
-        await resumeAudioContext();
-        const streamer = await ensureAudioInitialized();
-        streamer.addPCM16(new Uint8Array(data));
-    } catch (error) {
-        logMessage(`Error processing audio: ${error.message}`, 'system');
-    }
-});
-
-client.on('content', (data) => {
-    if (data.modelTurn) {
-        if (data.modelTurn.parts.some(part => part.functionCall)) {
-            isUsingTool = true;
-            Logger.info('Model is using a tool');
-        } else if (data.modelTurn.parts.some(part => part.functionResponse)) {
-            isUsingTool = false;
-            Logger.info('Tool usage completed');
-        }
-
-        const text = data.modelTurn.parts.map(part => part.text).join('');
-        if (text) {
-            logMessage(text, 'ai');
-        }
-    }
-});
-
-client.on('interrupted', () => {
-    audioStreamer?.stop();
-    isUsingTool = false;
-    Logger.info('Model interrupted');
-    logMessage('Model interrupted', 'system');
-});
-
-client.on('setupcomplete', () => {
-    logMessage('Setup complete', 'system');
-});
-
-client.on('turncomplete', () => {
-    isUsingTool = false;
-    logMessage('Turn complete', 'system');
-});
-
-client.on('error', (error) => {
-    if (error instanceof ApplicationError) {
-        Logger.error(`Application error: ${error.message}`, error);
-    } else {
-        Logger.error('Unexpected error', error);
-    }
-    logMessage(`Error: ${error.message}`, 'system');
-});
-
-client.on('message', (message) => {
-    if (message.error) {
-        Logger.error('Server error:', message.error);
-        logMessage(`Server error: ${message.error}`, 'system');
-    }
-});
-
-sendButton.addEventListener('click', handleSendMessage);
-messageInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        handleSendMessage();
-    }
-});
-
-micButton.addEventListener('click', handleMicToggle);
-
-connectButton.addEventListener('click', () => {
-    if (isConnected) {
-        disconnectFromWebsocket();
-    } else {
-        connectToWebsocket();
-    }
-});
-
-messageInput.disabled = true;
-sendButton.disabled = true;
-micButton.disabled = true;
-connectButton.textContent = 'Connect';
-
-/**
- * Handles the video toggle. Starts or stops video streaming.
- * @returns {Promise<void>}
- */
-async function handleVideoToggle() {
-    Logger.info('Video toggle clicked, current state:', { isVideoActive, isConnected });
-    
-    localStorage.setItem('video_fps', fpsInput.value);
-
-    if (!isVideoActive) {
-        try {
-            Logger.info('Attempting to start video');
-            if (!videoManager) {
-                videoManager = new VideoManager();
-            }
-            
-            // videoManager.start 内部应该会设置 preview.srcObject
-            await videoManager.start(fpsInput.value,(frameData) => {
-                if (isConnected) {
-                    client.sendRealtimeInput([frameData]);
-                }
-            });
-
-            // 确保视频容器显示
-            videoContainer.style.display = 'block';
-
-            isVideoActive = true;
-            cameraIcon.textContent = 'videocam_off';
-            cameraButton.classList.add('active');
-            Logger.info('Camera started successfully');
-            logMessage('Camera started', 'system');
-
-        } catch (error) {
-            Logger.error('Camera error:', error);
-            logMessage(`Error: ${error.message}`, 'system');
-            isVideoActive = false;
-            videoManager = null;
-            cameraIcon.textContent = 'videocam';
-            cameraButton.classList.remove('active');
-            // 发生错误时也执行完整的停止逻辑，确保清除残留
-            stopVideo(); 
-        }
-    } else {
-        Logger.info('Stopping video');
-        stopVideo();
-    }
-}
-
-/**
- * Stops the video streaming.
- */
-function stopVideo() {
-    Logger.info('Attempting to stop video and clear display.');
-    if (preview) {
-        preview.pause(); // 暂停视频播放
-        Logger.info('Video element paused.');
-
-        if (preview.srcObject) {
-            // 获取并停止所有 MediaStreamTrack
-            const tracks = preview.srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop(); // 停止轨道
-                Logger.info(`Track stopped: ${track.kind} - ${track.label}`);
-            });
-            preview.srcObject = null; // 清除 srcObject
-            Logger.info('srcObject set to null.');
-        } else {
-            Logger.info('No active srcObject found on preview element.');
-        }
-        
-        // **关键修复：强制视频元素重置以清除残留画面**
-        // 1. 设置一个空字符串作为 src
-        preview.src = ''; 
-        // 2. 强制加载这个空 src，这会清空内部缓冲区
-        preview.load();   
-        Logger.info('Video element src set to empty and loaded for clearing.');
-
-    } else {
-        Logger.info('Preview element not found.');
-    }
-
-    if (videoManager) {
-        videoManager.stop(); // 调用 videoManager 的 stop 方法 (可能重复但安全)
-        videoManager = null;
-        Logger.info('VideoManager stopped.');
-    }
-    
-    // 隐藏容器
-    videoContainer.style.display = 'none';
-    Logger.info('Video container hidden.');
-
-    isVideoActive = false;
-    cameraIcon.textContent = 'videocam';
-    cameraButton.classList.remove('active');
-    logMessage('Camera stopped', 'system');
-}
-
-cameraButton.addEventListener('click', handleVideoToggle);
-stopVideoButton.addEventListener('click', stopVideo);
-
-cameraButton.disabled = true;
-
-/**
- * Handles the screen share toggle. Starts or stops screen sharing.
- * @returns {Promise<void>}
- */
-async function handleScreenShare() {
-    if (!isScreenSharing) {
-        try {
-            screenContainer.style.display = 'block';
-            
-            screenRecorder = new ScreenRecorder();
-            // screenRecorder.start 内部应该会设置 screenPreview.srcObject
-            await screenRecorder.start(screenPreview, (frameData) => {
-                if (isConnected) {
-                    client.sendRealtimeInput([{
-                        mimeType: "image/jpeg",
-                        data: frameData
-                    }]);
-                }
-            });
-
-            isScreenSharing = true;
-            screenIcon.textContent = 'stop_screen_share';
-            screenButton.classList.add('active');
-            Logger.info('Screen sharing started');
-            logMessage('Screen sharing started', 'system');
-
-        } catch (error) {
-            Logger.error('Screen sharing error:', error);
-            logMessage(`Error: ${error.message}`, 'system');
-            isScreenSharing = false;
-            screenIcon.textContent = 'screen_share';
-            screenButton.classList.remove('active');
-            // 发生错误时也执行完整的停止逻辑，确保清除残留
-            stopScreenSharing();
-        }
-    } else {
-        stopScreenSharing();
-    }
-}
-
-/**
- * Stops the screen sharing.
- */
-function stopScreenSharing() {
-    Logger.info('Attempting to stop screen sharing and clear display.');
-    if (screenPreview) {
-        screenPreview.pause(); // 暂停视频播放
-        Logger.info('Screen preview element paused.');
-
-        if (screenPreview.srcObject) {
-            // 获取并停止所有 MediaStreamTrack
-            const tracks = screenPreview.srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop(); // 停止轨道
-                Logger.info(`Screen track stopped: ${track.kind} - ${track.label}`);
-            });
-            screenPreview.srcObject = null; // 清除 srcObject
-            Logger.info('Screen srcObject set to null.');
-        } else {
-            Logger.info('No active srcObject found on screenPreview element.');
-        }
-        
-        // **关键修复：强制视频元素重置以清除残留画面**
-        // 1. 设置一个空字符串作为 src
-        screenPreview.src = ''; 
-        // 2. 强制加载这个空 src，这会清空内部缓冲区
-        screenPreview.load();   
-        Logger.info('Screen preview element src set to empty and loaded for clearing.');
-
-    } else {
-        Logger.info('Screen preview element not found.');
-    }
-
-    if (screenRecorder) {
-        screenRecorder.stop(); // 调用 screenRecorder 的 stop 方法
-        screenRecorder = null;
-        Logger.info('ScreenRecorder stopped.');
-    }
-    
-    screenContainer.style.display = 'none';
-    Logger.info('Screen container hidden.');
-
-    isScreenSharing = false;
-    screenIcon.textContent = 'screen_share';
-    screenButton.classList.remove('active');
-    logMessage('Screen sharing stopped', 'system');
-}
-
-screenButton.addEventListener('click', handleScreenShare);
-screenButton.disabled = true;
