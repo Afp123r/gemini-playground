@@ -33,20 +33,22 @@ const fpsInput = document.getElementById('fps-input');
 const configToggle = document.getElementById('config-toggle');
 const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
-
-// ⚠️ 修改这里：将系统指令硬编码为新的组合内容，并显示在文本框中
+// 确保系统指令被硬编码并显示
 systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
 
 const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
 const languageSelect = document.getElementById('language-select');
 
+// 新增：获取视频容器和视频元素
+const videoContainer = document.getElementById('video-container');
+const preview = document.getElementById('preview');
+
+
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
 const savedVoice = localStorage.getItem('gemini_voice');
 const savedFPS = localStorage.getItem('video_fps');
-// ⚠️ 移除这里对 system_instruction 的加载，因为我们现在要硬编码它
-// const savedSystemInstruction = localStorage.getItem('system_instruction'); 
 const savedLanguage = localStorage.getItem('gemini_language');
 
 if (savedApiKey) {
@@ -58,11 +60,6 @@ if (savedVoice) {
 if (savedFPS) {
     fpsInput.value = savedFPS;
 }
-// ⚠️ 移除这里对 system_instruction 的应用
-// if (savedSystemInstruction) {
-//     systemInstructionInput.value = savedSystemInstruction;
-//     CONFIG.SYSTEM_INSTRUCTION.TEXT = savedSystemInstruction;
-// }
 if (savedLanguage) {
     languageSelect.value = savedLanguage;
 }
@@ -260,8 +257,6 @@ async function connectToWebsocket() {
     // Save values to localStorage
     localStorage.setItem('gemini_api_key', apiKeyInput.value);
     localStorage.setItem('gemini_voice', voiceSelect.value);
-    // ⚠️ 移除这里对 system_instruction 的保存，因为我们现在是硬编码它
-    // localStorage.setItem('system_instruction', systemInstructionInput.value);
     localStorage.setItem('gemini_language', languageSelect.value);
 
     const config = {
@@ -280,7 +275,7 @@ async function connectToWebsocket() {
         },
         systemInstruction: {
             parts: [{
-                // ⚠️ 硬编码新的组合系统指令在这里，确保它始终被发送给 API
+                // 硬编码系统指令在这里，确保它始终被发送给 API
                 text: "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。"
             }],
         }
@@ -337,6 +332,7 @@ function disconnectFromWebsocket() {
     screenButton.disabled = true;
     logMessage('Disconnected from server', 'system');
     
+    // 确保在断开连接时停止并清除视频/屏幕共享
     if (videoManager) {
         stopVideo();
     }
@@ -474,6 +470,9 @@ async function handleVideoToggle() {
                 }
             });
 
+            // 确保视频容器显示
+            videoContainer.style.display = 'block';
+
             isVideoActive = true;
             cameraIcon.textContent = 'videocam_off';
             cameraButton.classList.add('active');
@@ -487,6 +486,8 @@ async function handleVideoToggle() {
             videoManager = null;
             cameraIcon.textContent = 'videocam';
             cameraButton.classList.remove('active');
+            videoContainer.style.display = 'none'; // 发生错误时也隐藏
+            preview.srcObject = null; // 发生错误时也清除视频流
         }
     } else {
         Logger.info('Stopping video');
@@ -499,13 +500,19 @@ async function handleVideoToggle() {
  */
 function stopVideo() {
     if (videoManager) {
-        videoManager.stop();
+        videoManager.stop(); // This stops the MediaStreamTrack
         videoManager = null;
     }
     isVideoActive = false;
     cameraIcon.textContent = 'videocam';
     cameraButton.classList.remove('active');
     logMessage('Camera stopped', 'system');
+    
+    // 核心修复：清除视频流并隐藏容器
+    if (preview.srcObject) {
+        preview.srcObject = null; // 清除视频流
+    }
+    videoContainer.style.display = 'none'; // 隐藏视频容器
 }
 
 cameraButton.addEventListener('click', handleVideoToggle);
@@ -545,6 +552,7 @@ async function handleScreenShare() {
             screenIcon.textContent = 'screen_share';
             screenButton.classList.remove('active');
             screenContainer.style.display = 'none';
+            screenPreview.srcObject = null; // 发生错误时也清除
         }
     } else {
         stopScreenSharing();
@@ -564,6 +572,11 @@ function stopScreenSharing() {
     screenButton.classList.remove('active');
     screenContainer.style.display = 'none';
     logMessage('Screen sharing stopped', 'system');
+
+    // 确保清除屏幕共享视频流
+    if (screenPreview.srcObject) {
+        screenPreview.srcObject = null;
+    }
 }
 
 screenButton.addEventListener('click', handleScreenShare);
