@@ -44,7 +44,7 @@ body {
     gap: var(--spacing-md); /* Consistent spacing between sections */
 }
 
-/* Header Bar (API Key & Config Toggle) */
+/* Header Bar for API Key and Settings Toggle */
 .header-bar {
     display: flex;
     align-items: center;
@@ -418,6 +418,7 @@ input[type="number"] {
 }
 
 #input-audio-visualizer, #audio-visualizer {
+    width: 100%;
     height: 20px;
     background-color: #E0E0E0;
     border-radius: var(--border-radius-sm);
@@ -426,13 +427,16 @@ input[type="number"] {
     border: 1px solid var(--border-color);
 }
 
-.audio-bar {
+#input-audio-visualizer .audio-bar {
     height: 100%;
+    background-color: var(--primary-color); /* Green for input audio */
     width: 0%;
-    background: linear-gradient(90deg, var(--primary-color), #8BC34A); /* Green gradient */
-    position: absolute;
-    top: 0;
-    left: 0;
+}
+
+#audio-visualizer .audio-bar {
+    height: 100%;
+    background-color: var(--secondary-color); /* Blue for output audio */
+    width: 0%;
 }
 
 /* Audio bar pulse animation */
@@ -446,27 +450,27 @@ input[type="number"] {
     animation: audio-pulse 0.5s infinite alternate; /* Added alternate */
 }
 
-/* Video and Screen Containers (Keeping original positioning for now) */
+/* Video and Screen Containers - Based on your ORIGINAL CSS for stability */
 #video-container {
     position: fixed;
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
+    bottom: var(--spacing-lg); /* Use CSS variable for consistency */
+    right: var(--spacing-lg); /* Use CSS variable for consistency */
     width: 480px;
     z-index: 100;
-    background-color: var(--surface-color); /* Consistent with app surface */
+    /* Added some styling for visual appeal, but keeping original dimensions */
+    background-color: var(--surface-color); 
     border-radius: var(--border-radius-lg);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    padding: var(--spacing-md); /* Added padding */
+    padding: var(--spacing-md); /* Added padding for better look */
     border: 1px solid var(--border-color); /* Added border */
 }
 
 #video-container video {
     width: 100%;
     border-radius: var(--border-radius-md);
-    background-color: black; /* Still black for video area */
-    object-fit: contain;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    /* Removed object-fit and max-height to avoid potential conflicts */
     display: block; /* Ensure it takes full width of parent */
-    max-height: 360px; /* Limit height */
 }
 
 .video-controls {
@@ -485,7 +489,7 @@ input[type="number"] {
 }
 
 .video-controls button {
-    background-color: var(--danger-color);
+    background-color: var(--danger-color); /* Consistent danger color */
     color: white;
     border: none;
     padding: 8px 12px;
@@ -506,35 +510,36 @@ input[type="number"] {
 }
 
 #flip-camera {
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color); /* Consistent secondary color */
 }
 #flip-camera:hover {
     background-color: #1976D2;
 }
 
-
-/* Screen Sharing Container */
+/* Screen Sharing Container - Based on your ORIGINAL CSS for stability */
 #screen-container {
     position: fixed;
     top: var(--spacing-lg);
     right: var(--spacing-lg);
+    /* Keeping original width/height if defined, or setting a reasonable default */
+    width: 480px; /* Keeping original width for consistency */
+    height: 360px; /* Keeping original height for consistency */
+    z-index: 1000;
+    display: none; /* Controlled by JS */
+    /* Added some styling for visual appeal */
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    width: 600px; /* Adjusted width */
-    height: 450px; /* Adjusted height */
-    transition: all 0.3s ease;
-    display: none;
-    z-index: 1000;
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
+    transition: all 0.3s ease; /* Keep transition for hover effect */
 }
 
 #screen-preview {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: contain; /* Keeping object-fit: contain for screen share for better fit */
     background-color: black;
     display: block;
     border-radius: var(--border-radius-md);
@@ -645,9 +650,9 @@ input[type="number"] {
         transform: translateX(0);
     }
 
-    /* Video and Screen containers for mobile */
+    /* Video and Screen containers for mobile (Keeping original fixed positioning) */
     #video-container {
-        position: fixed; /* Keep fixed to avoid affecting scroll */
+        position: fixed; 
         bottom: var(--spacing-md);
         right: var(--spacing-md);
         left: var(--spacing-md); /* Span full width with margin */
