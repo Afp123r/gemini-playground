@@ -40,7 +40,7 @@ const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
 const languageSelect = document.getElementById('language-select');
 
-// 新增：获取视频容器和视频元素
+// 获取视频容器和视频元素
 const videoContainer = document.getElementById('video-container');
 const preview = document.getElementById('preview');
 
@@ -500,31 +500,46 @@ async function handleVideoToggle() {
  * Stops the video streaming.
  */
 function stopVideo() {
-    if (videoManager) {
-        videoManager.stop(); // 假设这个方法会停止 MediaStreamTrack
-        videoManager = null;
-    }
-    isVideoActive = false;
-    cameraIcon.textContent = 'videocam';
-    cameraButton.classList.remove('active');
-    logMessage('Camera stopped', 'system');
-    
-    // 核心修复：确保视频元素被完全清除和隐藏
+    Logger.info('Attempting to stop video and clear display.');
     if (preview) {
         preview.pause(); // 暂停视频播放
+        Logger.info('Video element paused.');
+
         if (preview.srcObject) {
-            // 遍历并停止所有 MediaStreamTrack
+            // 获取并停止所有 MediaStreamTrack
             const tracks = preview.srcObject.getTracks();
             tracks.forEach(track => {
                 track.stop(); // 停止轨道
                 Logger.info(`Track stopped: ${track.kind} - ${track.label}`);
             });
             preview.srcObject = null; // 清除 srcObject
+            Logger.info('srcObject set to null.');
+        } else {
+            Logger.info('No active srcObject found on preview element.');
         }
+        
         // 尝试重置 video 元素以清除任何残留的渲染状态
-        // preview.load(); // 重新加载视频元素，可能有助于清除缓存的帧
+        preview.removeAttribute('src'); // 移除任何残留的 src 属性
+        preview.load(); // 告诉视频元素重新加载 (这会清除内部缓冲区)
+        Logger.info('Video element src removed and loaded.');
+    } else {
+        Logger.info('Preview element not found.');
     }
-    videoContainer.style.display = 'none'; // 隐藏视频容器
+
+    if (videoManager) {
+        videoManager.stop(); // 调用 videoManager 的 stop 方法 (可能重复但安全)
+        videoManager = null;
+        Logger.info('VideoManager stopped.');
+    }
+    
+    // 隐藏容器
+    videoContainer.style.display = 'none';
+    Logger.info('Video container hidden.');
+
+    isVideoActive = false;
+    cameraIcon.textContent = 'videocam';
+    cameraButton.classList.remove('active');
+    logMessage('Camera stopped', 'system');
 }
 
 cameraButton.addEventListener('click', handleVideoToggle);
@@ -576,30 +591,45 @@ async function handleScreenShare() {
  * Stops the screen sharing.
  */
 function stopScreenSharing() {
-    if (screenRecorder) {
-        screenRecorder.stop(); // 假设这个方法会停止 MediaStreamTrack
-        screenRecorder = null;
-    }
-    isScreenSharing = false;
-    screenIcon.textContent = 'screen_share';
-    screenButton.classList.remove('active');
-    logMessage('Screen sharing stopped', 'system');
-
-    // 核心修复：确保屏幕共享视频元素被完全清除和隐藏
+    Logger.info('Attempting to stop screen sharing and clear display.');
     if (screenPreview) {
         screenPreview.pause(); // 暂停视频播放
+        Logger.info('Screen preview element paused.');
+
         if (screenPreview.srcObject) {
-            // 遍历并停止所有 MediaStreamTrack
+            // 获取并停止所有 MediaStreamTrack
             const tracks = screenPreview.srcObject.getTracks();
             tracks.forEach(track => {
                 track.stop(); // 停止轨道
                 Logger.info(`Screen track stopped: ${track.kind} - ${track.label}`);
             });
             screenPreview.srcObject = null; // 清除 srcObject
+            Logger.info('Screen srcObject set to null.');
+        } else {
+            Logger.info('No active srcObject found on screenPreview element.');
         }
-        // screenPreview.load(); // 重新加载视频元素
+        
+        // 尝试重置 video 元素以清除任何残留的渲染状态
+        screenPreview.removeAttribute('src'); // 移除任何残留的 src 属性
+        screenPreview.load(); // 告诉视频元素重新加载 (这会清除内部缓冲区)
+        Logger.info('Screen preview element src removed and loaded.');
+    } else {
+        Logger.info('Screen preview element not found.');
     }
+
+    if (screenRecorder) {
+        screenRecorder.stop(); // 调用 screenRecorder 的 stop 方法
+        screenRecorder = null;
+        Logger.info('ScreenRecorder stopped.');
+    }
+    
     screenContainer.style.display = 'none';
+    Logger.info('Screen container hidden.');
+
+    isScreenSharing = false;
+    screenIcon.textContent = 'screen_share';
+    screenButton.classList.remove('active');
+    logMessage('Screen sharing stopped', 'system');
 }
 
 screenButton.addEventListener('click', handleScreenShare);
