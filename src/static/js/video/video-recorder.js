@@ -72,6 +72,7 @@ export class VideoRecorder {
             Logger.info(`VideoRecorder: Internal frameCanvas set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
 
             // Set up preview on the HTML <video> element
+            Logger.info(`VideoRecorder: Assigning new stream to previewElement.srcObject. Current srcObject: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
             this.previewElement.srcObject = this.stream;
             // **CRITICAL FIX:** Set the video element's width and height attributes to its intrinsic resolution
             // This tells the browser the video's native aspect ratio, helping it render correctly.
@@ -80,7 +81,7 @@ export class VideoRecorder {
             Logger.info(`VideoRecorder: HTML previewElement attributes set to ${this.previewElement.width}x${this.previewElement.height}`);
 
             await this.previewElement.play();
-            Logger.info('VideoRecorder: Preview video started playing.');
+            Logger.info('VideoRecorder: Preview video started playing successfully.');
 
             // Start frame capture loop
             this.isRecording = true;
@@ -177,9 +178,11 @@ export class VideoRecorder {
 
             if (this.previewElement) {
                 this.previewElement.pause(); // Pause the video playback
+                Logger.info(`VideoRecorder: previewElement.srcObject before null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 this.previewElement.srcObject = null; // Clear the srcObject
                 this.previewElement.src = ''; // Clear the src attribute
                 this.previewElement.load(); // Force the video element to reload/clear its buffer
+                Logger.info(`VideoRecorder: previewElement.srcObject after null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
                 Logger.info('VideoRecorder: Preview element cleaned.');
             }
