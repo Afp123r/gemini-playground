@@ -17,10 +17,10 @@ export class VideoRecorder {
      */
     constructor(options = {}) {
         this.stream = null;
-        this.previewElement = null;
+        this.previewElement = null; // The <video> element in HTML
         this.isRecording = false;
         this.onVideoData = null;
-        this.frameCanvas = document.createElement('canvas');
+        this.frameCanvas = document.createElement('canvas'); // Internal canvas for capturing frames
         this.frameCtx = this.frameCanvas.getContext('2d');
         this.captureInterval = null;
         this.options = {
@@ -32,22 +32,24 @@ export class VideoRecorder {
             ...options
         };
         this.frameCount = 0; // Add frame counter for debugging
-        this.actualWidth = 640;
-        this.actualHeight = 480;
-        console.log(this.options);  
+        this.actualWidth = this.options.width; // Initialize with default/option width
+        this.actualHeight = this.options.height; // Initialize with default/option height
+        Logger.info('VideoRecorder: Initialized with options:', this.options);  
     }
 
     /**
      * Starts video recording.
      * @param {HTMLVideoElement} previewElement - The video element to display the video preview.
+     * @param {string} facingMode - 'user' or 'environment' for camera facing.
      * @param {Function} onVideoData - Callback function to receive video frame data.
      * @throws {ApplicationError} Throws an error if the video recording fails to start.
      */
-    async start(previewElement, facingMode, onVideoData, ) {
+    async start(previewElement, facingMode, onVideoData) {
         try {
             this.previewElement = previewElement;
             this.onVideoData = onVideoData;
 
+            Logger.info(`VideoRecorder: Requesting camera access with facingMode: ${facingMode}`);
             // Request camera access
             this.stream = await navigator.mediaDevices.getUserMedia({ 
                 video: {
@@ -58,34 +60,43 @@ export class VideoRecorder {
             });
 
             const videoTrack = this.stream.getVideoTracks()[0];
-            // 获取视频轨道的实际分辨率
             const settings = videoTrack.getSettings();
             this.actualWidth = settings.width;
             this.actualHeight = settings.height;
+            Logger.info(`VideoRecorder: Actual video resolution: ${this.actualWidth}x${this.actualHeight}`);
 
-            // 计算保持宽高比的情况下，限制高度最大为480的
-            if (this.actualHeight > 480) {
+            // Calculate dimensions to maintain aspect ratio and limit height
+            if (this.actualHeight > 480) { // Limit max height to 480
                 const aspectRatio = this.actualWidth / this.actualHeight;
                 this.actualHeight = 480;
                 this.actualWidth = Math.round(this.actualHeight * aspectRatio);
+                Logger.info(`VideoRecorder: Resized to maintain aspect ratio: ${this.actualWidth}x${this.actualHeight}`);
             }
 
-            // 设置画布尺寸
+            // Set internal canvas dimensions for frame processing
             this.frameCanvas.width = this.actualWidth;
             this.frameCanvas.height = this.actualHeight;
+            Logger.info(`VideoRecorder: Internal canvas set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
 
-            // Set up preview
+            // Set up preview on the HTML <video> element
             this.previewElement.srcObject = this.stream;
             await this.previewElement.play();
+            Logger.info('VideoRecorder: Preview video started playing.');
 
             // Start frame capture loop
             this.isRecording = true;
             this.startFrameCapture();
             
-            Logger.info('Video recording started');
+            // Listen for track ended event (e.g., if camera is disconnected)
+            videoTrack.addEventListener('ended', () => {
+                Logger.info('VideoRecorder: Camera track ended by system/user.');
+                this.stop(); // Ensure proper cleanup
+            });
+
+            Logger.info('VideoRecorder: Video recording started successfully.');
 
         } catch (error) {
-            Logger.error('Failed to start video recording:', error);
+            Logger.error('VideoRecorder: Failed to start video recording:', error);
             throw new ApplicationError(
                 'Failed to start video recording',
                 ErrorCodes.VIDEO_START_FAILED,
@@ -102,19 +113,24 @@ export class VideoRecorder {
         const frameInterval = 1000 / this.options.fps;
         
         this.captureInterval = setInterval(() => {
-            if (this.isRecording && this.onVideoData) {
-                try {
-                    // Draw current video frame to canvas
+            if (!this.isRecording || !this.onVideoData || !this.previewElement) {
+                //Logger.debug('VideoRecorder: Skipping frame capture - not recording or missing elements.');
+                return;
+            }
+            
+            try {
+                // Ensure video is playing and ready to draw
+                if (this.previewElement.readyState >= this.previewElement.HAVE_CURRENT_DATA) {
+                    // Draw current video frame to internal canvas
                     this.frameCtx.drawImage(
                         this.previewElement,
                         0, 0,
                         this.frameCanvas.width,
                         this.frameCanvas.height
                     );
-  
+    
                     // Convert to JPEG
                     const jpegData = this.frameCanvas.toDataURL('image/jpeg', this.options.quality);
-                    // Remove data URL prefix
                     const base64Data = jpegData.split(',')[1];
                     
                     if (!this.validateFrame(base64Data)) {
@@ -123,21 +139,16 @@ export class VideoRecorder {
 
                     this.frameCount++;
                     //const size = Math.round(base64Data.length / 1024);
-                    //Logger.debug(`Frame #${this.frameCount} captured (${size}KB)`);
+                    //Logger.debug(`VideoRecorder: Frame #${this.frameCount} captured (${size}KB)`);
                     
-                    if (!base64Data) {
-                        Logger.error('Empty frame data');
-                        return;
-                    }
-
                     this.onVideoData(base64Data);
-                } catch (error) {
-                    Logger.error('Frame capture error:', error);
                 }
+            } catch (error) {
+                Logger.error('VideoRecorder: Frame capture error:', error);
             }
         }, frameInterval);
 
-        Logger.info(`Video capture started at ${this.options.fps} FPS`);
+        Logger.info(`VideoRecorder: Video capture interval set at ${this.options.fps} FPS`);
     }
 
     /**
@@ -145,27 +156,44 @@ export class VideoRecorder {
      * @throws {ApplicationError} Throws an error if the video recording fails to stop.
      */
     stop() {
+        Logger.info('VideoRecorder: Stopping video recording.');
         try {
             this.isRecording = false;
             
             if (this.captureInterval) {
                 clearInterval(this.captureInterval);
                 this.captureInterval = null;
+                Logger.info('VideoRecorder: Capture interval cleared.');
             }
 
             if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop());
+                this.stream.getTracks().forEach(track => {
+                    track.stop(); // Stop all tracks in the stream
+                    Logger.info(`VideoRecorder: Track stopped: ${track.kind} - ${track.label}`);
+                });
+                this.stream = null; // Nullify the stream reference
+                Logger.info('VideoRecorder: Stream nullified.');
             }
 
             if (this.previewElement) {
-                this.previewElement.srcObject = null;
+                this.previewElement.pause(); // Pause the video playback
+                this.previewElement.srcObject = null; // Clear the srcObject
+                this.previewElement.src = ''; // Clear the src attribute
+                this.previewElement.load(); // Force the video element to reload/clear its buffer
+                // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
+                Logger.info('VideoRecorder: Preview element cleaned.');
             }
 
-            this.stream = null;
-            Logger.info('Video recording stopped');
+            // Clear internal canvas to prevent data accumulation
+            if (this.frameCanvas) {
+                this.frameCtx.clearRect(0, 0, this.frameCanvas.width, this.frameCanvas.height);
+                Logger.info('VideoRecorder: Internal frameCanvas cleared.');
+            }
+
+            Logger.info('VideoRecorder: Video recording stopped successfully.');
 
         } catch (error) {
-            Logger.error('Failed to stop video recording:', error);
+            Logger.error('VideoRecorder: Failed to stop video recording:', error);
             throw new ApplicationError(
                 'Failed to stop video recording',
                 ErrorCodes.VIDEO_STOP_FAILED,
@@ -197,21 +225,21 @@ export class VideoRecorder {
      * @private
      */
     validateFrame(base64Data) {
-        // Check if it's a valid base64 string
-        if (!/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
-            Logger.error('Invalid base64 data');
+        if (!base64Data || !/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
+            Logger.error('VideoRecorder: Invalid base64 data');
             return false;
         }
         
-        // Check minimum size (1KB)
-        if (base64Data.length < 1024) {
-            Logger.error('Frame too small');
+        if (base64Data.length < 1024) { // Minimum reasonable size for a valid JPEG frame
+            Logger.error('VideoRecorder: Frame too small, possibly empty or invalid.');
             return false;
         }
         
         return true;
     }
 
+    // The optimizeFrameQuality method is not called in your provided code paths,
+    // so it's kept as is but won't affect the current issue.
     /**
      * Optimizes the frame quality to reduce size.
      * @param {string} base64Data - Base64 encoded frame data.
@@ -231,4 +259,4 @@ export class VideoRecorder {
         
         return base64Data;
     }
-} 
+}
