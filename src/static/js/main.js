@@ -34,7 +34,7 @@ const configToggle = document.getElementById('config-toggle');
 const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
 // 确保系统指令被硬编码并显示
-systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
+systemInstructionInput.value = "You are my helpful assistant. You can see and hear me, and respond with voice and text. If you are asked about things you do not know, you can use the google search tool to find the answer.\n请根据我说话的语言进行回复。如果我用中文说话，请用中文回复；如果我用英文说话，请用英文回复。";
 
 const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
@@ -446,6 +446,8 @@ connectButton.addEventListener('click', () => {
 messageInput.disabled = true;
 sendButton.disabled = true;
 micButton.disabled = true;
+cameraButton.disabled = true;
+screenButton.disabled = true;
 connectButton.textContent = 'Connect';
 
 /**
@@ -659,8 +661,9 @@ function makeDraggableAndResizable(element, videoElement, minWidth = 200, minHei
     let initialX, initialY, initialWidth, initialHeight, initialLeft, initialTop;
 
     const handles = element.querySelectorAll('.resize-handle');
+    const controls = element.querySelector('.video-controls') || element.querySelector('.close-button'); // Get control buttons/container
 
-    // Make draggable - listen on the element itself (excluding handles)
+    // Make draggable - listen on the element itself (excluding handles AND controls)
     element.addEventListener('mousedown', dragStart);
     element.addEventListener('touchstart', dragStart, { passive: false });
 
@@ -687,8 +690,9 @@ function makeDraggableAndResizable(element, videoElement, minWidth = 200, minHei
     }
 
     function dragStart(e) {
-        // If clicking on a resize handle, don't start dragging
-        if (e.target.classList.contains('resize-handle')) {
+        // If clicking on a resize handle, or a control button/its child, don't start dragging
+        if (e.target.classList.contains('resize-handle') || 
+            (controls && controls.contains(e.target))) { // Check if target is controls or inside controls
             return;
         }
 
