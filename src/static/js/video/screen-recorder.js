@@ -45,7 +45,7 @@ export class ScreenRecorder {
             this.onScreenData = onScreenData;
             this.previewElement = previewElement;
 
-            Logger.info('ScreenRecorder: Requesting screen sharing access.');
+            Logger.info('ScreenRecorder: Requesting screen sharing access with getDisplayMedia.');
             // Request screen sharing access with audio
             this.stream = await navigator.mediaDevices.getDisplayMedia({ 
                 video: {
@@ -56,11 +56,17 @@ export class ScreenRecorder {
                 audio: false // Set to true if you want to capture audio as well
             });
 
+            if (!this.stream || this.stream.getTracks().length === 0) {
+                Logger.error('ScreenRecorder: getDisplayMedia returned no tracks or an invalid stream.');
+                throw new Error('No screen stream tracks available.');
+            }
+            Logger.info(`ScreenRecorder: getDisplayMedia successful. Stream has ${this.stream.getTracks().length} tracks.`);
+
+
             // Set up preview
             if (this.previewElement) {
                 this.previewElement.srcObject = this.stream;
-                Logger.info('ScreenRecorder: previewElement.srcObject set with new stream.');
-                await new Promise((resolve) => {
+                await new Promise((resolve, reject) => {
                     this.previewElement.onloadedmetadata = () => {
                         this.previewElement.play()
                             .then(() => {
@@ -73,8 +79,12 @@ export class ScreenRecorder {
                             })
                             .catch(error => {
                                 Logger.error('ScreenRecorder: Failed to play preview:', error);
-                                resolve(); // Resolve anyway to not block
+                                reject(error); // Reject the promise if play fails
                             });
+                    };
+                    this.previewElement.onerror = (e) => {
+                        Logger.error('ScreenRecorder: Preview video error:', e);
+                        reject(new Error('Video element error during playback.'));
                     };
                 });
             }
@@ -93,6 +103,7 @@ export class ScreenRecorder {
 
         } catch (error) {
             if (error.name === 'NotAllowedError') {
+                Logger.error('ScreenRecorder: Screen sharing permission denied:', error);
                 throw new ApplicationError(
                     'Screen sharing permission denied',
                     ErrorCodes.SCREEN_PERMISSION_DENIED,
@@ -148,6 +159,8 @@ export class ScreenRecorder {
                         //Logger.debug(`ScreenRecorder: Screen frame #${this.frameCount} captured`);
                         this.onScreenData(base64Data);
                     }
+                } else {
+                    //Logger.debug(`ScreenRecorder: Preview element not ready. ReadyState: ${this.previewElement.readyState}`);
                 }
             } catch (error) {
                 Logger.error('ScreenRecorder: Screen frame capture error:', error);
@@ -183,11 +196,9 @@ export class ScreenRecorder {
 
             if (this.previewElement) {
                 this.previewElement.pause(); // Pause the preview video
-                Logger.info(`ScreenRecorder: previewElement.srcObject before null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 this.previewElement.srcObject = null; // Clear srcObject
                 this.previewElement.src = ''; // Clear src
                 this.previewElement.load(); // Reload to clear buffer
-                Logger.info(`ScreenRecorder: previewElement.srcObject after null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
                 Logger.info('ScreenRecorder: Preview element cleaned.');
             }
