@@ -27,7 +27,7 @@ export class VideoManager {
         this.videoContainer = document.getElementById('video-container');
         this.previewVideo = document.getElementById('preview');
         this.stopVideoButton = document.getElementById('stop-video');
-        this.framePreview = document.createElement('canvas');
+        this.framePreview = document.createElement('canvas'); // This is the canvas for the small preview
         
         // State management
         this.lastFrameData = null;
@@ -61,9 +61,26 @@ export class VideoManager {
         // 在构造函数中直接绑定事件
         this.flipCameraButton.addEventListener('click', async () => {
             try {
-                await this.flipCamera();
+                // Stop the current videoRecorder, which also stops tracks and clears srcObject
+                if (this.videoRecorder) {
+                    this.videoRecorder.stop();
+                    this.videoRecorder = null; // Ensure it's nullified
+                }
+                this.isActive = false; // Mark inactive before flipping
+
+                Logger.info('Flipping camera');
+                this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
+                
+                // Re-start the video manager with the new facing mode
+                await this.start(this.fps, this.onFrame);
+                Logger.info('Camera flipped successfully');
             } catch (error) {
                 Logger.error('Error flipping camera:', error);
+                throw new ApplicationError(
+                    'Failed to flip camera',
+                    ErrorCodes.VIDEO_FLIP_FAILED,
+                    { originalError: error }
+                );
             }
         });
     }
@@ -74,7 +91,7 @@ export class VideoManager {
      */
     setupFramePreview() {
         this.framePreview.id = 'frame-preview';
-        this.framePreview.width = 320;
+        this.framePreview.width = 320; // Keep original sizes
         this.framePreview.height = 240;
         this.videoContainer.appendChild(this.framePreview);
 
@@ -93,6 +110,8 @@ export class VideoManager {
         const img = new Image();
         img.onload = () => {
             const ctx = this.framePreview.getContext('2d');
+            // Clear the canvas before drawing to prevent accumulation/ghosting
+            ctx.clearRect(0, 0, this.framePreview.width, this.framePreview.height);
             ctx.drawImage(img, 0, 0, width, height);
         };
         img.src = 'data:image/jpeg;base64,' + base64Data;
@@ -130,14 +149,16 @@ export class VideoManager {
         try {
             this.onFrame = onFrame;
             this.fps = fps;
-            Logger.info('Starting video manager');
+            Logger.info('VideoManager: Starting video manager');
             this.videoContainer.style.display = 'block';
-            console.log("fps:",fps);
+            console.log("VideoManager: FPS set to", fps);
+            
+            // Re-initialize VideoRecorder
             this.videoRecorder = new VideoRecorder({fps: fps});
                         
             await this.videoRecorder.start(this.previewVideo,this.facingMode, (base64Data) => {
                 if (!this.isActive) {
-                    //Logger.debug('Skipping frame - inactive');
+                    //Logger.debug('VideoManager: Skipping frame - inactive');
                     return;
                 }
 
@@ -150,11 +171,12 @@ export class VideoManager {
             });
 
             this.isActive = true;
+            Logger.info('VideoManager: Video manager started successfully.');
             return true;
 
         } catch (error) {
-            Logger.error('Video manager error:', error);
-            this.stop();
+            Logger.error('VideoManager: Video manager error during start:', error);
+            this.stop(); // Ensure full stop on error
             throw new ApplicationError(
                 'Failed to start video manager',
                 ErrorCodes.VIDEO_START_FAILED,
@@ -172,25 +194,25 @@ export class VideoManager {
     processFrame(base64Data, onFrame) {
         const img = new Image();
         img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            // Create a temporary canvas for motion detection, not the preview canvas
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, 0, 0);
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             
             if (this.lastFrameData) {
                 const motionScore = this.detectMotion(this.lastFrameData, imageData.data);
                 if (motionScore < this.MOTION_THRESHOLD && this.frameCount % this.FORCE_FRAME_INTERVAL !== 0) {
-                    //Logger.debug(`Skipping frame - low motion (score: ${motionScore})`);
+                    //Logger.debug(`VideoManager: Skipping frame - low motion (score: ${motionScore})`);
                     return;
                 }
             }
 
-            this.framePreviewWidth = Math.round(canvas.width * 0.5);
-            this.framePreviewHeight = Math.round(canvas.height * 0.5);
-
-            this.updateFramePreview(base64Data,this.framePreviewWidth,this.framePreviewHeight);
+            // Update the actual framePreview canvas
+            // Ensure width/height passed to updateFramePreview are consistent with the canvas's own dimensions
+            this.updateFramePreview(base64Data, this.framePreview.width, this.framePreview.height);
             
             this.lastFrameData = imageData.data;
             this.lastSignificantFrame = base64Data;
@@ -198,7 +220,7 @@ export class VideoManager {
             this.frameCount++;
 
             const size = Math.round(base64Data.length / 1024);
-            //Logger.debug(`Processing frame (${size}KB) - frame #${this.frameCount}`);
+            //Logger.debug(`VideoManager: Processing frame (${size}KB) - frame #${this.frameCount}`);
 
             onFrame({
                 mimeType: "image/jpeg",
@@ -212,28 +234,43 @@ export class VideoManager {
      * Stops video capture and processing
      */
     stop() {
+        Logger.info('VideoManager: Stopping video manager.');
         if (this.videoRecorder) {
-            this.videoRecorder.stop();
+            this.videoRecorder.stop(); // This stops the MediaStreamTrack and clears srcObject on previewVideo
             this.videoRecorder = null;
+            Logger.info('VideoManager: VideoRecorder stopped.');
         }
         this.isActive = false;
-        this.videoContainer.style.display = 'none';
+        
+        // Clear the framePreview canvas explicitly
+        if (this.framePreview) {
+            const ctx = this.framePreview.getContext('2d');
+            ctx.clearRect(0, 0, this.framePreview.width, this.framePreview.height);
+            // Optionally, fill with a background color if desired, e.g., ctx.fillStyle = '#000'; ctx.fillRect(0,0, this.framePreview.width, this.framePreview.height);
+            Logger.info('VideoManager: framePreview canvas cleared.');
+        }
+
+        this.videoContainer.style.display = 'none'; // Hide the main video container
+        Logger.info('VideoManager: videoContainer hidden.');
+
         this.lastFrameData = null;
         this.lastSignificantFrame = null;
         this.frameCount = 0;
+        Logger.info('VideoManager: State variables reset.');
     }
 
 
     async flipCamera() {
-
         try {
-            Logger.info('Flipping camera');
+            Logger.info('VideoManager: Flipping camera initiated.');
+            // `stop()` is now called implicitly at the start of `flipCameraButton` event listener
+            // This ensures a clean slate before attempting to start a new stream.
+            
             this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
-            this.stop();
-            await this.start(this.fps,this.onFrame);
-            Logger.info('Camera flipped successfully');
+            await this.start(this.fps,this.onFrame); // Restart with new facing mode
+            Logger.info('VideoManager: Camera flipped successfully');
         } catch (error) {
-            Logger.error('Error flipping camera:', error);
+            Logger.error('VideoManager: Error flipping camera:', error);
             throw new ApplicationError(
                 'Failed to flip camera',
                 ErrorCodes.VIDEO_FLIP_FAILED,
