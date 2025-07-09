@@ -63,23 +63,22 @@ export class VideoRecorder {
             const settings = videoTrack.getSettings();
             this.actualWidth = settings.width;
             this.actualHeight = settings.height;
-            Logger.info(`VideoRecorder: Actual video resolution: ${this.actualWidth}x${this.actualHeight}`);
+            Logger.info(`VideoRecorder: Actual video resolution received: ${this.actualWidth}x${this.actualHeight}`);
 
-            // Calculate dimensions to maintain aspect ratio and limit height
-            if (this.actualHeight > 480) { // Limit max height to 480
-                const aspectRatio = this.actualWidth / this.actualHeight;
-                this.actualHeight = 480;
-                this.actualWidth = Math.round(this.actualHeight * aspectRatio);
-                Logger.info(`VideoRecorder: Resized to maintain aspect ratio: ${this.actualWidth}x${this.actualHeight}`);
-            }
-
-            // Set internal canvas dimensions for frame processing
+            // Set internal canvas dimensions for frame processing to match actual stream
+            // This canvas is for sending frames to the API, not for display
             this.frameCanvas.width = this.actualWidth;
             this.frameCanvas.height = this.actualHeight;
-            Logger.info(`VideoRecorder: Internal canvas set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
+            Logger.info(`VideoRecorder: Internal frameCanvas set to ${this.frameCanvas.width}x${this.frameCanvas.height}`);
 
             // Set up preview on the HTML <video> element
             this.previewElement.srcObject = this.stream;
+            // **CRITICAL FIX:** Set the video element's width and height attributes to its intrinsic resolution
+            // This tells the browser the video's native aspect ratio, helping it render correctly.
+            this.previewElement.width = this.actualWidth;
+            this.previewElement.height = this.actualHeight;
+            Logger.info(`VideoRecorder: HTML previewElement attributes set to ${this.previewElement.width}x${this.previewElement.height}`);
+
             await this.previewElement.play();
             Logger.info('VideoRecorder: Preview video started playing.');
 
@@ -141,7 +140,8 @@ export class VideoRecorder {
                     //const size = Math.round(base64Data.length / 1024);
                     //Logger.debug(`VideoRecorder: Frame #${this.frameCount} captured (${size}KB)`);
                     
-                    this.onVideoData(base64Data);
+                    // Pass actual dimensions along with base64Data
+                    this.onVideoData(base64Data, this.actualWidth, this.actualHeight); 
                 }
             } catch (error) {
                 Logger.error('VideoRecorder: Frame capture error:', error);
