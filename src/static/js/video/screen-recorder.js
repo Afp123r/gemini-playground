@@ -59,6 +59,7 @@ export class ScreenRecorder {
             // Set up preview
             if (this.previewElement) {
                 this.previewElement.srcObject = this.stream;
+                Logger.info('ScreenRecorder: previewElement.srcObject set with new stream.');
                 await new Promise((resolve) => {
                     this.previewElement.onloadedmetadata = () => {
                         this.previewElement.play()
@@ -182,9 +183,11 @@ export class ScreenRecorder {
 
             if (this.previewElement) {
                 this.previewElement.pause(); // Pause the preview video
+                Logger.info(`ScreenRecorder: previewElement.srcObject before null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 this.previewElement.srcObject = null; // Clear srcObject
                 this.previewElement.src = ''; // Clear src
                 this.previewElement.load(); // Reload to clear buffer
+                Logger.info(`ScreenRecorder: previewElement.srcObject after null: ${this.previewElement.srcObject ? 'exists' : 'null'}`);
                 // Note: Do NOT nullify previewElement here, as it's a DOM element managed by main.js
                 Logger.info('ScreenRecorder: Preview element cleaned.');
             }
