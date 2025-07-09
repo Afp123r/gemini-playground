@@ -17,6 +17,7 @@
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --primary-color-rgb: 76, 175, 80; /* RGB for primary color */
+    --secondary-color-rgb: 33, 150, 243; /* RGB for secondary color */
 }
 
 body {
@@ -156,8 +157,8 @@ select, textarea, input[type="number"] {
 
 select:focus, textarea:focus, input[type="number"]:focus {
     border-color: var(--primary-color);
-    outline: none;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
+    outline: none;
 }
 
 textarea {
@@ -346,7 +347,7 @@ input[type="number"] {
     white-space: nowrap;
     position: relative;
     overflow: hidden;
-    flex-shrink: 0; /* Prevent buttons from shrinking too much */
+    flex-shrink: 0;
 }
 
 .input-controls button:hover {
@@ -459,35 +460,56 @@ input[type="number"] {
     animation: audio-pulse 0.5s infinite alternate;
 }
 
-/* Video and Screen Containers */
-#video-container {
-    position: fixed;
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 480px; /* Fixed width for desktop */
-    z-index: 100;
+/* Video and Screen Containers - Now draggable and resizable */
+#video-container, #screen-container {
+    position: fixed; /* Crucial for dragging */
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
-    box-sizing: border-box; /* Include padding in width */
+    box-sizing: border-box;
+    display: none; /* Controlled by JS */
+    z-index: 1000; /* Base z-index for these elements */
+    cursor: grab; /* Indicate draggable area */
+    overflow: hidden; /* Ensure content stays within bounds */
+    min-width: 200px; /* Minimum size for resizing */
+    min-height: 150px;
 }
 
-#video-container video {
+#video-container {
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 480px; /* Default desktop width */
+    height: 360px; /* Default desktop height (4:3 aspect ratio) */
+}
+
+#screen-container {
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 640px; /* Default desktop width */
+    height: 480px; /* Default desktop height (4:3 aspect ratio) */
+}
+
+#video-container.dragging, #screen-container.dragging {
+    cursor: grabbing;
+}
+
+#video-container video, #screen-container video {
     width: 100%; /* Fill container width */
-    height: auto; /* Maintain aspect ratio */
+    height: 100%; /* Fill container height */
     border-radius: var(--border-radius-md);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: block; /* Remove extra space below video */
-    object-fit: contain; /* Ensure video fits within bounds without cropping */
+    display: block;
+    object-fit: contain; /* CRITICAL: Maintain aspect ratio within the container */
+    background-color: black; /* Fill black if object-fit creates empty space */
 }
 
 .video-controls {
     position: absolute;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    z-index: 101;
+    z-index: 1001; /* Above video content but below handles */
     display: flex;
     gap: var(--spacing-xs);
     opacity: 0;
@@ -529,14 +551,14 @@ input[type="number"] {
 /* Small frame preview canvas */
 #frame-preview {
     position: absolute;
-    bottom: var(--spacing-xs); /* Use spacing variable */
-    right: var(--spacing-xs); /* Use spacing variable */
-    width: 120px; /* Fixed size for small preview */
+    bottom: var(--spacing-xs);
+    right: var(--spacing-xs);
+    width: 120px;
     height: 90px;
     border: 2px solid rgba(66, 133, 244, 0.8);
     border-radius: 4px;
     background: #000;
-    z-index: 2;
+    z-index: 1001; /* Above video content */
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -552,7 +574,7 @@ input[type="number"] {
     bottom: 50%;
     right: 50%;
     transform: translate(50%, 50%);
-    z-index: 4;
+    z-index: 1003; /* Higher z-index when enlarged */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -564,42 +586,10 @@ input[type="number"] {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
+    z-index: 1002; /* Overlay below enlarged preview */
 }
 
-/* Screen Sharing Container */
-#screen-container {
-    position: fixed;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 600px; /* Fixed width for desktop */
-    height: 450px; /* Fixed height for desktop */
-    z-index: 1000;
-    display: none; /* Controlled by JS */
-    background-color: var(--surface-color);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-color);
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-}
-
-#screen-preview {
-    width: 100%;
-    height: 100%; /* Fill container */
-    object-fit: contain; /* Ensure screen share fits without cropping */
-    background-color: black;
-    display: block;
-    border-radius: var(--border-radius-md);
-}
-
-#screen-container:hover {
-    transform: scale(1.01);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
+/* Screen container close button */
 #screen-container .close-button {
     position: absolute;
     top: var(--spacing-sm);
@@ -617,6 +607,7 @@ input[type="number"] {
     opacity: 0;
     transition: opacity 0.3s ease, background-color 0.3s ease;
     font-size: 1.3em;
+    z-index: 1001; /* Above screen content */
 }
 
 #screen-container:hover .close-button {
@@ -626,6 +617,33 @@ input[type="number"] {
 #screen-container .close-button:hover {
     background: rgba(0, 0, 0, 0.8);
 }
+
+/* Resize handles */
+.resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: rgba(var(--secondary-color-rgb), 0.8);
+    border: 1px solid white;
+    border-radius: 2px;
+    z-index: 1002; /* Above video controls and content */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#video-container:hover .resize-handle,
+#screen-container:hover .resize-handle {
+    opacity: 1;
+}
+
+.resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
+.resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
+.resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.resize-handle.left { top: 50%; left: -5px; transform: translateY(-50%); cursor: ew-resize; width: 5px; height: 20px; }
+.resize-handle.right { top: 50%; right: -5px; transform: translateY(-50%); cursor: ew-resize; width: 5px; height: 20px; }
+.resize-handle.top { left: 50%; top: -5px; transform: translateX(-50%); cursor: ns-resize; height: 5px; width: 20px; }
+.resize-handle.bottom { left: 50%; bottom: -5px; transform: translateX(-50%); cursor: ns-resize; height: 5px; width: 20px; }
 
 /* Responsive styles */
 @media (max-width: 768px) {
@@ -699,60 +717,42 @@ input[type="number"] {
         transform: translateX(0);
     }
 
-    /* Video and Screen containers for mobile */
-    #video-container {
-        position: fixed;
-        bottom: var(--spacing-md);
-        left: var(--spacing-md);
+    /* Video and Screen containers for mobile - now more flexible */
+    #video-container, #screen-container {
+        position: fixed; /* Keep fixed for consistent dragging/resizing */
+        left: var(--spacing-md); /* Use left/right to define width */
         right: var(--spacing-md);
-        width: auto; /* Allow width to be determined by left/right */
-        height: auto; /* Let height adjust based on content/aspect ratio */
-        max-height: 50vh; /* Limit max height to prevent it from taking too much screen */
+        width: auto; /* Let left/right define width */
+        height: auto; /* Let content/aspect ratio define height */
+        max-width: calc(100% - 2 * var(--spacing-md)); /* Ensure it doesn't overflow */
+        max-height: 80vh; /* Limit max height for mobile view */
         padding: var(--spacing-sm);
         box-sizing: border-box;
+        /* Reset default positions for mobile to be more central */
+        top: unset; /* Reset top */
+        bottom: var(--spacing-md); /* Position from bottom */
     }
 
-    #video-container video {
-        /* On mobile, ensure video fills its responsive container while maintaining aspect ratio */
-        width: 100%;
-        height: auto; /* Crucial for maintaining aspect ratio */
-        object-fit: contain; /* Ensure entire video is visible, add black bars if needed */
+    #screen-container {
+        top: var(--spacing-md); /* Position from top for screen share */
+        bottom: unset; /* Reset bottom */
     }
 
+    /* Smaller frame preview on mobile */
     #frame-preview {
-        /* Adjust small preview position for mobile */
-        width: 100px; /* Smaller preview on mobile */
-        height: 75px;
-        bottom: var(--spacing-sm);
-        right: var(--spacing-sm);
+        width: 80px;
+        height: 60px;
+        bottom: var(--spacing-xs);
+        right: var(--spacing-xs);
     }
 
     #frame-preview.enlarged {
         /* Adjust enlarged preview for mobile to be more central */
         width: calc(100% - 2 * var(--spacing-md));
-        height: auto; /* Let height adjust */
+        height: auto;
         max-height: 80vh;
         bottom: 50%;
         right: 50%;
         transform: translate(50%, 50%);
-    }
-
-    #screen-container {
-        position: fixed;
-        top: var(--spacing-md);
-        left: var(--spacing-md);
-        right: var(--spacing-md);
-        width: auto; /* Allow width to be determined by left/right */
-        height: auto; /* Let height adjust based on content/aspect ratio */
-        max-height: calc(100vh - 2 * var(--spacing-md)); /* Fit to screen height */
-        padding: var(--spacing-sm);
-        box-sizing: border-box;
-    }
-
-    #screen-preview {
-        /* On mobile, ensure screen preview fills its responsive container while maintaining aspect ratio */
-        width: 100%;
-        height: 100%; /* Still fill container */
-        object-fit: contain; /* Ensure entire screen share is visible */
     }
 }
