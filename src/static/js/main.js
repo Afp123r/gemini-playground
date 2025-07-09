@@ -47,7 +47,7 @@ const preview = document.getElementById('preview');
 
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
-const savedVoice = localStorage.getItem('gemini_voice');
+const savedVoice = localStorage = localStorage.getItem('gemini_voice');
 const savedFPS = localStorage.getItem('video_fps');
 const savedLanguage = localStorage.getItem('gemini_language');
 
@@ -661,9 +661,10 @@ function makeDraggableAndResizable(element, videoElement, minWidth = 200, minHei
     let initialX, initialY, initialWidth, initialHeight, initialLeft, initialTop;
 
     const handles = element.querySelectorAll('.resize-handle');
-    const controls = element.querySelector('.video-controls') || element.querySelector('.close-button'); // Get control buttons/container
+    // Get all potential control buttons/containers that should NOT trigger drag
+    const nonDraggableElements = element.querySelectorAll('.video-controls, .close-button, #frame-preview'); 
 
-    // Make draggable - listen on the element itself (excluding handles AND controls)
+    // Make draggable - listen on the element itself (excluding handles AND non-draggable elements)
     element.addEventListener('mousedown', dragStart);
     element.addEventListener('touchstart', dragStart, { passive: false });
 
@@ -691,9 +692,14 @@ function makeDraggableAndResizable(element, videoElement, minWidth = 200, minHei
 
     function dragStart(e) {
         // If clicking on a resize handle, or a control button/its child, don't start dragging
-        if (e.target.classList.contains('resize-handle') || 
-            (controls && controls.contains(e.target))) { // Check if target is controls or inside controls
+        if (e.target.classList.contains('resize-handle')) {
             return;
+        }
+        // Check if the clicked target is one of the non-draggable control elements or a descendant of them
+        for (let i = 0; i < nonDraggableElements.length; i++) {
+            if (nonDraggableElements[i].contains(e.target)) {
+                return; // Do not drag if clicking on a control button/area
+            }
         }
 
         e.preventDefault(); // Prevent default browser drag behavior (e.g., image drag)
