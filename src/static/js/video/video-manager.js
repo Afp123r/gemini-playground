@@ -61,14 +61,19 @@ export class VideoManager {
         // 在构造函数中直接绑定事件
         this.flipCameraButton.addEventListener('click', async () => {
             try {
-                // Stop the current videoRecorder, which also stops tracks and clears srcObject
+                Logger.info('VideoManager: Flip camera button clicked.');
+                // Stop the current videoRecorder and ensure all resources are released
                 if (this.videoRecorder) {
+                    Logger.info('VideoManager: Stopping current videoRecorder before flip.');
                     this.videoRecorder.stop();
                     this.videoRecorder = null; // Ensure it's nullified
                 }
                 this.isActive = false; // Mark inactive before flipping
 
-                Logger.info('VideoManager: Flipping camera');
+                // Introduce a small delay to allow the browser to fully release the previous stream
+                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+
+                Logger.info(`VideoManager: Flipping camera from ${this.facingMode} to ${this.facingMode === 'user' ? 'environment' : 'user'}`);
                 this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
                 
                 // Re-start the video manager with the new facing mode
