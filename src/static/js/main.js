@@ -464,6 +464,7 @@ async function handleVideoToggle() {
                 videoManager = new VideoManager();
             }
             
+            // videoManager.start 内部应该会设置 preview.srcObject
             await videoManager.start(fpsInput.value,(frameData) => {
                 if (isConnected) {
                     client.sendRealtimeInput([frameData]);
@@ -486,8 +487,8 @@ async function handleVideoToggle() {
             videoManager = null;
             cameraIcon.textContent = 'videocam';
             cameraButton.classList.remove('active');
-            videoContainer.style.display = 'none'; // 发生错误时也隐藏
-            preview.srcObject = null; // 发生错误时也清除视频流
+            // 发生错误时也执行完整的停止逻辑，确保清除残留
+            stopVideo(); 
         }
     } else {
         Logger.info('Stopping video');
@@ -500,7 +501,7 @@ async function handleVideoToggle() {
  */
 function stopVideo() {
     if (videoManager) {
-        videoManager.stop(); // This stops the MediaStreamTrack
+        videoManager.stop(); // 假设这个方法会停止 MediaStreamTrack
         videoManager = null;
     }
     isVideoActive = false;
@@ -508,9 +509,20 @@ function stopVideo() {
     cameraButton.classList.remove('active');
     logMessage('Camera stopped', 'system');
     
-    // 核心修复：清除视频流并隐藏容器
-    if (preview.srcObject) {
-        preview.srcObject = null; // 清除视频流
+    // 核心修复：确保视频元素被完全清除和隐藏
+    if (preview) {
+        preview.pause(); // 暂停视频播放
+        if (preview.srcObject) {
+            // 遍历并停止所有 MediaStreamTrack
+            const tracks = preview.srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop(); // 停止轨道
+                Logger.info(`Track stopped: ${track.kind} - ${track.label}`);
+            });
+            preview.srcObject = null; // 清除 srcObject
+        }
+        // 尝试重置 video 元素以清除任何残留的渲染状态
+        // preview.load(); // 重新加载视频元素，可能有助于清除缓存的帧
     }
     videoContainer.style.display = 'none'; // 隐藏视频容器
 }
@@ -530,6 +542,7 @@ async function handleScreenShare() {
             screenContainer.style.display = 'block';
             
             screenRecorder = new ScreenRecorder();
+            // screenRecorder.start 内部应该会设置 screenPreview.srcObject
             await screenRecorder.start(screenPreview, (frameData) => {
                 if (isConnected) {
                     client.sendRealtimeInput([{
@@ -551,8 +564,8 @@ async function handleScreenShare() {
             isScreenSharing = false;
             screenIcon.textContent = 'screen_share';
             screenButton.classList.remove('active');
-            screenContainer.style.display = 'none';
-            screenPreview.srcObject = null; // 发生错误时也清除
+            // 发生错误时也执行完整的停止逻辑，确保清除残留
+            stopScreenSharing();
         }
     } else {
         stopScreenSharing();
@@ -564,19 +577,29 @@ async function handleScreenShare() {
  */
 function stopScreenSharing() {
     if (screenRecorder) {
-        screenRecorder.stop();
+        screenRecorder.stop(); // 假设这个方法会停止 MediaStreamTrack
         screenRecorder = null;
     }
     isScreenSharing = false;
     screenIcon.textContent = 'screen_share';
     screenButton.classList.remove('active');
-    screenContainer.style.display = 'none';
     logMessage('Screen sharing stopped', 'system');
 
-    // 确保清除屏幕共享视频流
-    if (screenPreview.srcObject) {
-        screenPreview.srcObject = null;
+    // 核心修复：确保屏幕共享视频元素被完全清除和隐藏
+    if (screenPreview) {
+        screenPreview.pause(); // 暂停视频播放
+        if (screenPreview.srcObject) {
+            // 遍历并停止所有 MediaStreamTrack
+            const tracks = screenPreview.srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop(); // 停止轨道
+                Logger.info(`Screen track stopped: ${track.kind} - ${track.label}`);
+            });
+            screenPreview.srcObject = null; // 清除 srcObject
+        }
+        // screenPreview.load(); // 重新加载视频元素
     }
+    screenContainer.style.display = 'none';
 }
 
 screenButton.addEventListener('click', handleScreenShare);
