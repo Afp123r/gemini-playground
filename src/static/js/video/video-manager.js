@@ -68,14 +68,14 @@ export class VideoManager {
                 }
                 this.isActive = false; // Mark inactive before flipping
 
-                Logger.info('Flipping camera');
+                Logger.info('VideoManager: Flipping camera');
                 this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
                 
                 // Re-start the video manager with the new facing mode
                 await this.start(this.fps, this.onFrame);
-                Logger.info('Camera flipped successfully');
+                Logger.info('VideoManager: Camera flipped successfully');
             } catch (error) {
-                Logger.error('Error flipping camera:', error);
+                Logger.error('VideoManager: Error flipping camera:', error);
                 throw new ApplicationError(
                     'Failed to flip camera',
                     ErrorCodes.VIDEO_FLIP_FAILED,
@@ -91,7 +91,8 @@ export class VideoManager {
      */
     setupFramePreview() {
         this.framePreview.id = 'frame-preview';
-        this.framePreview.width = 320; // Keep original sizes
+        // Initial dimensions, these will be dynamically updated based on the actual video stream aspect ratio
+        this.framePreview.width = 320;
         this.framePreview.height = 240;
         this.videoContainer.appendChild(this.framePreview);
 
@@ -102,17 +103,38 @@ export class VideoManager {
     }
 
     /**
-     * Updates the frame preview with new image data
+     * Updates the frame preview with new image data, maintaining aspect ratio.
      * @param {string} base64Data - Base64 encoded image data
+     * @param {number} originalWidth - Original width of the image frame
+     * @param {number} originalHeight - Original height of the image frame
      * @private
      */
-    updateFramePreview(base64Data,width,height) {
+    updateFramePreview(base64Data, originalWidth, originalHeight) {
         const img = new Image();
         img.onload = () => {
             const ctx = this.framePreview.getContext('2d');
-            // Clear the canvas before drawing to prevent accumulation/ghosting
-            ctx.clearRect(0, 0, this.framePreview.width, this.framePreview.height);
-            ctx.drawImage(img, 0, 0, width, height);
+            ctx.clearRect(0, 0, this.framePreview.width, this.framePreview.height); // Clear before drawing
+
+            // Calculate dimensions to fit into 320x240 (framePreview canvas) while maintaining aspect ratio
+            const canvasAspectRatio = this.framePreview.width / this.framePreview.height;
+            const imageAspectRatio = originalWidth / originalHeight;
+
+            let drawWidth = this.framePreview.width;
+            let drawHeight = this.framePreview.height;
+
+            if (imageAspectRatio > canvasAspectRatio) {
+                // Image is wider than canvas, fit by width
+                drawHeight = drawWidth / imageAspectRatio;
+            } else {
+                // Image is taller than canvas, fit by height
+                drawWidth = drawHeight * imageAspectRatio;
+            }
+
+            // Center the image if it doesn't fill the canvas completely
+            const offsetX = (this.framePreview.width - drawWidth) / 2;
+            const offsetY = (this.framePreview.height - drawHeight) / 2;
+
+            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
         };
         img.src = 'data:image/jpeg;base64,' + base64Data;
     }
@@ -156,7 +178,7 @@ export class VideoManager {
             // Re-initialize VideoRecorder
             this.videoRecorder = new VideoRecorder({fps: fps});
                         
-            await this.videoRecorder.start(this.previewVideo,this.facingMode, (base64Data) => {
+            await this.videoRecorder.start(this.previewVideo,this.facingMode, (base64Data, originalWidth, originalHeight) => {
                 if (!this.isActive) {
                     //Logger.debug('VideoManager: Skipping frame - inactive');
                     return;
@@ -167,11 +189,11 @@ export class VideoManager {
                     return;
                 }
 
-                this.processFrame(base64Data, onFrame);
+                // Pass originalWidth and originalHeight from VideoRecorder to processFrame
+                this.processFrame(base64Data, originalWidth, originalHeight, onFrame);
             });
 
             this.isActive = true;
-            Logger.info('VideoManager: Video manager started successfully.');
             return true;
 
         } catch (error) {
@@ -188,10 +210,12 @@ export class VideoManager {
     /**
      * Processes a single video frame
      * @param {string} base64Data - Base64 encoded frame data
+     * @param {number} originalWidth - Original width of the image frame
+     * @param {number} originalHeight - Original height of the image frame
      * @param {Function} onFrame - Frame callback
      * @private
      */
-    processFrame(base64Data, onFrame) {
+    processFrame(base64Data, originalWidth, originalHeight, onFrame) {
         const img = new Image();
         img.onload = () => {
             // Create a temporary canvas for motion detection, not the preview canvas
@@ -210,9 +234,8 @@ export class VideoManager {
                 }
             }
 
-            // Update the actual framePreview canvas
-            // Ensure width/height passed to updateFramePreview are consistent with the canvas's own dimensions
-            this.updateFramePreview(base64Data, this.framePreview.width, this.framePreview.height);
+            // Pass the actual image dimensions to updateFramePreview
+            this.updateFramePreview(base64Data, originalWidth, originalHeight);
             
             this.lastFrameData = imageData.data;
             this.lastSignificantFrame = base64Data;
