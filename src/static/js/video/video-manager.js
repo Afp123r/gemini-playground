@@ -60,27 +60,26 @@ export class VideoManager {
         
         // 在构造函数中直接绑定事件
         this.flipCameraButton.addEventListener('click', async () => {
+            Logger.info('VideoManager: Flip Camera button clicked.');
             try {
-                Logger.info('VideoManager: Flip camera button clicked.');
-                // Stop the current videoRecorder and ensure all resources are released
+                // Stop the current videoRecorder, which also stops tracks and clears srcObject
                 if (this.videoRecorder) {
-                    Logger.info('VideoManager: Stopping current videoRecorder before flip.');
+                    Logger.info('VideoManager: Stopping current videoRecorder before flipping.');
                     this.videoRecorder.stop();
                     this.videoRecorder = null; // Ensure it's nullified
                 }
                 this.isActive = false; // Mark inactive before flipping
 
-                // Introduce a small delay to allow the browser to fully release the previous stream
-                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-
-                Logger.info(`VideoManager: Flipping camera from ${this.facingMode} to ${this.facingMode === 'user' ? 'environment' : 'user'}`);
                 this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
+                Logger.info(`VideoManager: Toggled facingMode to: ${this.facingMode}`);
                 
                 // Re-start the video manager with the new facing mode
                 await this.start(this.fps, this.onFrame);
-                Logger.info('VideoManager: Camera flipped successfully');
+                Logger.info('VideoManager: Camera flipped successfully and new stream started.');
             } catch (error) {
                 Logger.error('VideoManager: Error flipping camera:', error);
+                // Ensure UI reflects stopped state if flipping fails
+                this.stop(); 
                 throw new ApplicationError(
                     'Failed to flip camera',
                     ErrorCodes.VIDEO_FLIP_FAILED,
@@ -176,12 +175,13 @@ export class VideoManager {
         try {
             this.onFrame = onFrame;
             this.fps = fps;
-            Logger.info('VideoManager: Starting video manager');
+            Logger.info('VideoManager: Attempting to start video manager.');
             this.videoContainer.style.display = 'block';
-            console.log("VideoManager: FPS set to", fps);
+            Logger.info(`VideoManager: FPS set for capture: ${fps}`);
             
             // Re-initialize VideoRecorder
             this.videoRecorder = new VideoRecorder({fps: fps});
+            Logger.info('VideoManager: New VideoRecorder instance created.');
                         
             await this.videoRecorder.start(this.previewVideo,this.facingMode, (base64Data, originalWidth, originalHeight) => {
                 if (!this.isActive) {
@@ -199,6 +199,7 @@ export class VideoManager {
             });
 
             this.isActive = true;
+            Logger.info('VideoManager: Video manager started successfully.');
             return true;
 
         } catch (error) {
@@ -264,9 +265,12 @@ export class VideoManager {
     stop() {
         Logger.info('VideoManager: Stopping video manager.');
         if (this.videoRecorder) {
+            Logger.info('VideoManager: Calling videoRecorder.stop().');
             this.videoRecorder.stop(); // This stops the MediaStreamTrack and clears srcObject on previewVideo
             this.videoRecorder = null;
-            Logger.info('VideoManager: VideoRecorder stopped.');
+            Logger.info('VideoManager: VideoRecorder instance nullified.');
+        } else {
+            Logger.info('VideoManager: No active videoRecorder to stop.');
         }
         this.isActive = false;
         
@@ -274,7 +278,6 @@ export class VideoManager {
         if (this.framePreview) {
             const ctx = this.framePreview.getContext('2d');
             ctx.clearRect(0, 0, this.framePreview.width, this.framePreview.height);
-            // Optionally, fill with a background color if desired, e.g., ctx.fillStyle = '#000'; ctx.fillRect(0,0, this.framePreview.width, this.framePreview.height);
             Logger.info('VideoManager: framePreview canvas cleared.');
         }
 
@@ -295,6 +298,7 @@ export class VideoManager {
             // This ensures a clean slate before attempting to start a new stream.
             
             this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';         
+            Logger.info(`VideoManager: Facing mode set to: ${this.facingMode}`);
             await this.start(this.fps,this.onFrame); // Restart with new facing mode
             Logger.info('VideoManager: Camera flipped successfully');
         } catch (error) {
