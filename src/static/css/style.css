@@ -410,7 +410,6 @@ input[type="number"] {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #4CAF50, #8BC34A); /* Green gradient */
-    /* transition: width 0.1s ease-out; // 移除此行，使用动画代替 */
     position: absolute;
     top: 0;
     left: 0;
@@ -569,4 +568,3 @@ input[type="number"] {
          */
     }
 }
-
