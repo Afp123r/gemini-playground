@@ -9,10 +9,11 @@
 </head>
 <body>
     <div id="app">
-        <div class="settings">
+        <div class="header-bar">
             <input type="password" id="api-key" placeholder="Please Input Gemini API Key" />
             <button id="config-toggle" class="material-symbols-outlined">settings</button>
         </div>
+        
         <div id="config-container" class="hidden-mobile">
             <div class="config-wrapper">
                 <div class="setting-container">
@@ -32,7 +33,6 @@
                         <option value="audio" selected>Audio</option>
                     </select>
                 </div>
-                <!-- 新增：语言选择下拉菜单 -->
                 <div class="setting-container">
                     <span class="setting-label">Language: </span>
                     <select id="language-select">
@@ -77,19 +77,25 @@
                 <button id="apply-config">Confirm</button>
             </div>
         </div>
+        
         <button id="connect-button">Connect</button>
+        
         <div id="logs-container"></div>
-        <input type="text" id="message-input" placeholder="Enter message...">
-        <button id="send-button">Send</button>
-        <button id="mic-button">
-            <span id="mic-icon" class="material-symbols-outlined">mic</span>
-        </button>
-        <button id="camera-button">
-            <span id="camera-icon" class="material-symbols-outlined">videocam</span>
-        </button>
-        <button id="screen-button">
-            <span id="screen-icon" class="material-symbols-outlined">screen_share</span>
-        </button>
+        
+        <div class="input-controls">
+            <input type="text" id="message-input" placeholder="Enter message...">
+            <button id="send-button">Send</button>
+            <button id="mic-button">
+                <span id="mic-icon" class="material-symbols-outlined">mic</span>
+            </button>
+            <button id="camera-button">
+                <span id="camera-icon" class="material-symbols-outlined">videocam</span>
+            </button>
+            <button id="screen-button">
+                <span id="screen-icon" class="material-symbols-outlined">screen_share</span>
+            </button>
+        </div>
+
         <div class="audio-visualizers">
             <div class="visualizer-container">
                 <label>Input Audio</label>
@@ -100,6 +106,7 @@
                 <div id="audio-visualizer"></div>
             </div>
         </div>
+        
         <div id="video-container" style="display: none;">
             <video id="preview" playsinline autoplay muted></video>
             <div class="video-controls">
