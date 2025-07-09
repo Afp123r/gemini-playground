@@ -434,7 +434,6 @@ input[type="number"] {
     border-radius: var(--border-radius-sm);
     overflow: hidden;
     position: relative;
-    border: 1px solid var(--border-color);
 }
 
 #input-audio-visualizer .audio-bar {
@@ -462,7 +461,7 @@ input[type="number"] {
 
 /* Video and Screen Containers - Now draggable and resizable */
 #video-container, #screen-container {
-    position: fixed; /* Crucial for dragging */
+    position: fixed;
     background-color: var(--surface-color);
     border-radius: var(--border-radius-lg);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -505,6 +504,7 @@ input[type="number"] {
     background-color: black; /* Fill black if object-fit creates empty space */
 }
 
+/* Video controls (Stop Video, Flip Camera) */
 .video-controls {
     position: absolute;
     top: var(--spacing-sm);
@@ -512,16 +512,16 @@ input[type="number"] {
     z-index: 1001; /* Above video content but below handles */
     display: flex;
     gap: var(--spacing-xs);
-    opacity: 0;
+    opacity: 0; /* Hidden by default on desktop */
     transition: opacity 0.3s ease;
 }
 
 #video-container:hover .video-controls {
-    opacity: 1;
+    opacity: 1; /* Show on hover for desktop */
 }
 
 .video-controls button {
-    background-color: var(--danger-color);
+    background-color: var(--danger-color); /* Stop Video button color */
     color: white;
     border: none;
     padding: 8px 12px;
@@ -558,7 +558,7 @@ input[type="number"] {
     border: 2px solid rgba(66, 133, 244, 0.8);
     border-radius: 4px;
     background: #000;
-    z-index: 1001; /* Above video content */
+    z-index: 1001;
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -574,7 +574,7 @@ input[type="number"] {
     bottom: 50%;
     right: 50%;
     transform: translate(50%, 50%);
-    z-index: 1003; /* Higher z-index when enlarged */
+    z-index: 1003;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -586,7 +586,7 @@ input[type="number"] {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1002; /* Overlay below enlarged preview */
+    z-index: 1002;
 }
 
 /* Screen container close button */
@@ -604,14 +604,14 @@ input[type="number"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
+    opacity: 0; /* Hidden by default on desktop */
     transition: opacity 0.3s ease, background-color 0.3s ease;
     font-size: 1.3em;
-    z-index: 1001; /* Above screen content */
+    z-index: 1001;
 }
 
 #screen-container:hover .close-button {
-    opacity: 1;
+    opacity: 1; /* Show on hover for desktop */
 }
 
 #screen-container .close-button:hover {
@@ -626,7 +626,7 @@ input[type="number"] {
     background-color: rgba(var(--secondary-color-rgb), 0.8);
     border: 1px solid white;
     border-radius: 2px;
-    z-index: 1002; /* Above video controls and content */
+    z-index: 1002;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -733,6 +733,41 @@ input[type="number"] {
         bottom: var(--spacing-md); /* Position from bottom */
     }
 
+    #video-container video, #screen-container video {
+        width: 100%;
+        height: 100%; /* Fill container height */
+        object-fit: contain; /* Maintain aspect ratio */
+        background-color: black;
+    }
+
+    /* Make video controls always visible on mobile */
+    .video-controls {
+        opacity: 1; /* Always visible on mobile */
+        position: absolute; /* Keep absolute positioning within container */
+        top: var(--spacing-sm);
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Adjust for centering */
+        right: unset; /* Remove right positioning */
+        width: calc(100% - 2 * var(--spacing-sm)); /* Give it some width */
+        justify-content: center; /* Center buttons within the flex container */
+        gap: var(--spacing-md); /* More space between buttons */
+    }
+
+    .video-controls button {
+        padding: 10px 15px; /* Larger touch targets */
+        font-size: 1em;
+    }
+
+    /* Make screen close button always visible on mobile */
+    #screen-container .close-button {
+        opacity: 1; /* Always visible on mobile */
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        width: 40px; /* Larger touch target */
+        height: 40px;
+        font-size: 1.5em;
+    }
+
     #screen-container {
         top: var(--spacing-md); /* Position from top for screen share */
         bottom: unset; /* Reset bottom */
@@ -747,12 +782,16 @@ input[type="number"] {
     }
 
     #frame-preview.enlarged {
-        /* Adjust enlarged preview for mobile to be more central */
         width: calc(100% - 2 * var(--spacing-md));
         height: auto;
         max-height: 80vh;
         bottom: 50%;
         right: 50%;
         transform: translate(50%, 50%);
+    }
+
+    /* Hide resize handles on mobile for cleaner look, as dragging is primary interaction */
+    .resize-handle {
+        display: none !important;
     }
 }
